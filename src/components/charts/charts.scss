@@ -1,0 +1,23 @@
+#chartOuter{
+	display: grid;
+	grid-template-columns: 1fr;
+	grid-template-rows: 0.1fr 6fr 3fr;
+	height: calc(100vh - 80px);
+	width: calc(100vw - 65px);
+}
+
+#chartHeader{
+	grid-column: 1/2;
+	grid-row: 1/2;
+}
+
+#chartMain{
+	grid-column: 1/2;
+	grid-row: 2/3;
+}
+
+#chartSub{
+	grid-column: 1/2;
+	grid-row: 3/4;
+}
+
