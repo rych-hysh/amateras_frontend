@@ -1,10 +1,13 @@
 import { Box } from "@mui/material";
+import PrivatePage from "../private-page";
 
-export function Algorythm(){
+export function Algorythm() {
 
 	return (
-		<Box>
-			algorythm works
-		</Box>
+		<PrivatePage>
+			<Box>
+				algorythm works
+			</Box>
+		</PrivatePage>
 	)
 }

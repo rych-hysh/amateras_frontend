@@ -8,11 +8,18 @@ import { Setting } from '../settings/settings';
 import { GridTest } from '../grid-template/grid';
 import { GridTest2 } from '../grid-template/grid2';
 import { Landing } from "../landing/landing";
+import { useAuth } from "../../hooks/use-auth";
+import { SignIn } from "../Auth/sign-in/signin";
 
 export function MainContent() {
+	const auth = useAuth();
+
+	if(auth.isLoading){
+		return <div></div>;
+	}
+
+
 	return (
-		<>
-			<BrowserRouter>
 				<Routes>
 					<Route path="/" element={<Landing />} />
 					<Route path='/charts' element={<Charts />} />
@@ -22,8 +29,7 @@ export function MainContent() {
 					<Route path='/settings' element={<Setting />} />
 					<Route path='/grid' element={<GridTest />} />
 					<Route path='/grid2' element={<GridTest2 />} />
+					<Route path="/signin" element={<SignIn />} />
 				</Routes>
-			</BrowserRouter>
-		</>
 	);
 }
