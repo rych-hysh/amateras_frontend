@@ -8,6 +8,7 @@ import { Setting } from '../settings/settings';
 import { GridTest } from '../grid-template/grid';
 import { GridTest2 } from '../grid-template/grid2';
 import { Landing } from "../landing/landing";
+import { SignIn } from "../../auth/sign-in/sign-in";
 
 export function MainContent() {
 	return (
@@ -21,6 +22,7 @@ export function MainContent() {
 					<Route path='/settings' element={<Setting />} />
 					<Route path='/grid' element={<GridTest />} />
 					<Route path='/grid2' element={<GridTest2 />} />
+					<Route path="/signin" element={<SignIn />} />
 				</Routes>
 		</>
 	);
