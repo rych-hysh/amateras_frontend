@@ -24,6 +24,7 @@ import { BsCalculator, BsCodeSlash } from "react-icons/bs";
 import { IoMdNotifications } from "react-icons/io";
 
 import { MainContent } from '../main-content/main-content';
+import { BrowserRouter, Link, Navigate, useNavigate, Routes } from 'react-router-dom';
 
 const drawerWidth = 240;
 
@@ -99,6 +100,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 export function MainAppBar() {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
+  const navigate = useNavigate();
 
   const handleDrawerOpen = () => {
     fetch("http://localhost:3030/users").then((response) => response.json()).then((res) => alert(res[0].username));
@@ -123,8 +125,12 @@ export function MainAppBar() {
     setOpen(false);
   };
 
+  const navTo = (path: any) => {
+    navigate(path);
+  }
+
   return (
-    <Box sx={{ display: 'flex' }}>
+      <Box sx={{ display: 'flex' }}>
       <CssBaseline />
       <AppBar position="fixed" open={open}>
         <Toolbar sx={{ height: "5vh" }}>
@@ -164,7 +170,7 @@ export function MainAppBar() {
                   justifyContent: open ? 'initial' : 'center',
                   px: 2.5,
                 }}
-                href="/charts"
+                onClick={navTo.bind(null, '/charts')}
               >
                 <ListItemIcon
                   sx={{
@@ -188,7 +194,7 @@ export function MainAppBar() {
                   justifyContent: open ? 'initial' : 'center',
                   px: 2.5,
                 }}
-                href="/simulator"
+                onClick={navTo.bind(null, "/simulator")}
               >
                 <ListItemIcon
                   sx={{
@@ -212,7 +218,7 @@ export function MainAppBar() {
                   justifyContent: open ? 'initial' : 'center',
                   px: 2.5,
                 }}
-                href="/algorythm"
+                onClick={navTo.bind(null, "/algorythm")}
               >
                 <ListItemIcon
                   sx={{
@@ -236,7 +242,7 @@ export function MainAppBar() {
                   justifyContent: open ? 'initial' : 'center',
                   px: 2.5,
                 }}
-                href="/notification"
+                onClick={navTo.bind(null, "/notification")}
               >
                 <ListItemIcon
                   sx={{
@@ -263,7 +269,7 @@ export function MainAppBar() {
                   justifyContent: open ? 'initial' : 'center',
                   px: 2.5,
                 }}
-                href={index % 2 === 0 ? "/grid" : "grid2"}
+                onClick={navTo.bind(null, index % 2 === 0 ? "/grid" : "grid2")}
               >
                 <ListItemIcon
                   sx={{
@@ -283,10 +289,10 @@ export function MainAppBar() {
       <Box component="main" sx={{ flexGrow: 1, p: 0 }}>
         <DrawerHeader />
         {/*Todo--別ファイルへ------*/}
-<MainContent />
-      {/*-----------------------*/}
-
-    </Box>
+        <MainContent />
+        {/*-----------------------*/}
+      </Box>
     </Box >
+    
   );
 }
