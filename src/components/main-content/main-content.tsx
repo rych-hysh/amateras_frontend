@@ -12,7 +12,6 @@ import { Landing } from "../landing/landing";
 export function MainContent() {
 	return (
 		<>
-			<BrowserRouter>
 				<Routes>
 					<Route path="/" element={<Landing />} />
 					<Route path='/charts' element={<Charts />} />
@@ -23,7 +22,6 @@ export function MainContent() {
 					<Route path='/grid' element={<GridTest />} />
 					<Route path='/grid2' element={<GridTest2 />} />
 				</Routes>
-			</BrowserRouter>
 		</>
 	);
 }
