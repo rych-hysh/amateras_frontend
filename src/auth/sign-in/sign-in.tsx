@@ -1,15 +1,18 @@
 import { Auth } from "aws-amplify"
 import { useState } from "react";
-import { AuthService } from "../auth-service";
+import { useNavigate } from "react-router";
 import { initAuth } from "../config/auth";
+import { useAuth } from "../use-auth";
 
 export function SignIn(){
-	const [email, setEmail] = useState("");
+	const auth = useAuth();
+	const navigate = useNavigate();
+	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	
 
-	const handleChangeEmail = (event: any) => {
-		setEmail(event.target.value);
+	const handleChangeUsername = (event: any) => {
+		setUsername(event.target.value);
 	}
 
 	const handleChangePassword = (event: any) => {
@@ -18,24 +21,21 @@ export function SignIn(){
 
 	const signIn = async (event: any) => {
 		event.preventDefault();
-		try{
-			const result = await Auth.signIn(email, password);
-			console.log(result);
-			// initAuth();
-			const ses = await Auth.currentSession();
-			console.log(ses);
-		}catch(error: any){
-			console.log(error);
-			alert(error.message);
+		const result = await auth.signIn(username, password);
+		if(result.success){
+			navigate({pathname: '/charts'});
+		}else {
+			alert(result.message);
 		}
+
 	}
 
 	return (
 		<>
 			<form onSubmit={signIn}>
 				<label>
-					email:
-					<input type="text" value={email} onChange={handleChangeEmail} />
+					username:
+					<input type="text" value={username} onChange={handleChangeUsername} />
 				</label>
 				<label>
 					password:

@@ -2,11 +2,11 @@ import { Auth } from "aws-amplify";
 import { useState } from "react";
 
 export function ConfirmSignUp() {
-	const [email, setEmail] = useState("");
+	const [nickname, setNickname] = useState("");
 	const [code, setCode] = useState("");
 
-	const handleChangeEmail = (event: any) => {
-		setEmail(event.target.value);
+	const handleChangeNickname = (event: any) => {
+		setNickname(event.target.value);
 	}
 
 	const handleChangeCode = (event: any) => {
@@ -16,7 +16,7 @@ export function ConfirmSignUp() {
 	const confirmSignUp = async (event: any) => {
 		event.preventDefault();
 		try{
-			const result = await Auth.confirmSignUp(email, code);
+			const result = await Auth.confirmSignUp(nickname, code);
 			console.log(result);
 			const ses = await Auth.currentSession();
 			console.log(ses);
@@ -30,8 +30,8 @@ export function ConfirmSignUp() {
 		<>
 			<form onSubmit={confirmSignUp}>
 				<label>
-					email:
-					<input type="text" value={email} onChange={handleChangeEmail} />
+					nickname:
+					<input type="text" value={nickname} onChange={handleChangeNickname} />
 				</label>
 				<label>
 					code:

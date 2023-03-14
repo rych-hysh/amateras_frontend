@@ -5,6 +5,7 @@ import { Chart } from "react-google-charts";
 import clsx from 'clsx'
 import "./simulator.scss"
 import { useEffect, useState } from "react";
+import PrivatePage from "../private-page";
 
 export const data = [
 	["algorythm", "origin", "alg1", "alg2"],
@@ -106,7 +107,7 @@ export function Simulator() {
 
 	let simulatorId = 0;
 	return (
-		<>
+		<PrivatePage>
 			<div id="simulator-container">
 				<div id="simulator-outer">
 					<div id="selectSim" className="simulator-inner">
@@ -197,6 +198,6 @@ export function Simulator() {
 					</div>
 				</div>
 			</div>
-		</>
+		</PrivatePage>
 	)
 }
