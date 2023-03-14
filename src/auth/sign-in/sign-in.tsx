@@ -1,6 +1,7 @@
 import { Auth } from "aws-amplify"
 import { useState } from "react";
 import { AuthService } from "../auth-service";
+import { initAuth } from "../config/auth";
 
 export function SignIn(){
 	const [email, setEmail] = useState("");
@@ -20,6 +21,9 @@ export function SignIn(){
 		try{
 			const result = await Auth.signIn(email, password);
 			console.log(result);
+			// initAuth();
+			const ses = await Auth.currentSession();
+			console.log(ses);
 		}catch(error: any){
 			console.log(error);
 			alert(error.message);

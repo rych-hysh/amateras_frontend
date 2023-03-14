@@ -20,6 +20,7 @@ export class AuthService{
 		Auth.signIn(email, password).then(()=>{
 			this.currentSession.isLoading = false;
 			this.currentSession.isAuthorized = true;
+			Auth.currentSession().then(res => alert(res));
 		})
 	}
 
