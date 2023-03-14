@@ -28,6 +28,8 @@ import { BrowserRouter, Link, Navigate, useNavigate, Routes } from 'react-router
 import { useAuth } from '../../auth/use-auth';
 import { AccountCircle } from '@mui/icons-material';
 
+import './mainappbar.scss';
+
 const drawerWidth = 240;
 
 const openedMixin = (theme: Theme): CSSObject => ({
@@ -100,7 +102,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 );
 
 export function MainAppBar() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, signOut } = useAuth();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const navigate = useNavigate();
@@ -110,9 +112,10 @@ export function MainAppBar() {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleClose = () => {
+  const handleClose = (path: string) => {
     setAnchorEl(null);
-    navigate('/profile')
+    if(path == "/charts") signOut();
+    navigate(path)
   };
 
   const handleDrawerOpen = () => {
@@ -166,7 +169,7 @@ export function MainAppBar() {
             FX Chart
           </Typography>
           {isAuthenticated && (
-            <div>
+            <div className='accountCircle'>
               <IconButton
                 size="large"
                 aria-label="account of current user"
@@ -175,7 +178,7 @@ export function MainAppBar() {
                 onClick={handleMenu}
                 color="inherit"
               >
-                <AccountCircle />
+                <AccountCircle fontSize='large'/>
               </IconButton>
               <Menu
                 id="menu-appbar"
@@ -192,8 +195,8 @@ export function MainAppBar() {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
               >
-                <MenuItem onClick={handleClose}>Profile</MenuItem>
-                <MenuItem onClick={handleClose}>My account</MenuItem>
+                <MenuItem onClick={handleClose.bind(null, '/profile')}>Profile</MenuItem>
+                <MenuItem onClick={handleClose.bind(null, '/charts')}>Sign out</MenuItem>
               </Menu>
             </div>
           )}
