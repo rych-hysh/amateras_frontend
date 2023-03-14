@@ -11,6 +11,7 @@ import { Landing } from "../landing/landing";
 import { SignIn } from "../../auth/sign-in/sign-in";
 import { SignUp } from "../../auth/sign-up/sign-up";
 import { ConfirmSignUp } from "../../auth/confirm-sign-up/confirm-sign-up";
+import { Profile } from "../profile/profile";
 
 export function MainContent() {
 	return (
@@ -27,6 +28,7 @@ export function MainContent() {
 					<Route path="/signin" element={<SignIn />} />
 					<Route path="/signup" element={<SignUp />} />
 					<Route path="/cofirmsignup" element={<ConfirmSignUp />} />
+					<Route path="/profile" element={<Profile />} />
 				</Routes>
 		</>
 	);

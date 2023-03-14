@@ -112,6 +112,7 @@ export function MainAppBar() {
 
   const handleClose = () => {
     setAnchorEl(null);
+    navigate('/profile')
   };
 
   const handleDrawerOpen = () => {

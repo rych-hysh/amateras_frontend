@@ -7,7 +7,7 @@ interface Result{
 }
 
 interface UseAuth{
-	session: string,
+	sub: string,
 	username: string,
 	isLoading: boolean,
 	isAuthenticated: boolean,
@@ -37,18 +37,21 @@ const useProvideAuth = () : UseAuth => {
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
 	const [username, setUsername] = useState('');
 	const [password, setPassword] = useState('');
-	const [session, setSession] = useState('');
+	const [sub, setSub] = useState('');
+
 
 	useEffect(()=>{
 		setIsLoading(true);
 		Auth.currentAuthenticatedUser()
 				.then((result) => {
+					setSub(result.attributes.sub);
 					setUsername(result.username);
 					setIsAuthenticated(true);
 					setIsLoading(false);
 				})
 				.catch((error) => {
 					console.log(error);
+					setSub('')
 					setUsername('');
 					setIsAuthenticated(false);
 					setIsLoading(false);
@@ -118,7 +121,7 @@ const useProvideAuth = () : UseAuth => {
 	};
 
 	return {
-		session,
+		sub,
 		isLoading,
 		isAuthenticated,
 		username,
