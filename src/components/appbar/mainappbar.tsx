@@ -18,13 +18,15 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
-import { Tooltip } from '@mui/material';
+import { Menu, MenuItem, Tooltip } from '@mui/material';
 import { TbChartCandle } from "react-icons/tb";
 import { BsCalculator, BsCodeSlash } from "react-icons/bs";
 import { IoMdNotifications } from "react-icons/io";
 
 import { MainContent } from '../main-content/main-content';
 import { BrowserRouter, Link, Navigate, useNavigate, Routes } from 'react-router-dom';
+import { useAuth } from '../../auth/use-auth';
+import { AccountCircle } from '@mui/icons-material';
 
 const drawerWidth = 240;
 
@@ -98,9 +100,19 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 );
 
 export function MainAppBar() {
+  const { isAuthenticated } = useAuth();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const navigate = useNavigate();
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
+  const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   const handleDrawerOpen = () => {
     fetch("http://localhost:3030/users").then((response) => response.json()).then((res) => alert(res[0].username));
@@ -152,6 +164,38 @@ export function MainAppBar() {
           <Typography variant="h6" noWrap component="div">
             FX Chart
           </Typography>
+          {isAuthenticated && (
+            <div>
+              <IconButton
+                size="large"
+                aria-label="account of current user"
+                aria-controls="menu-appbar"
+                aria-haspopup="true"
+                onClick={handleMenu}
+                color="inherit"
+              >
+                <AccountCircle />
+              </IconButton>
+              <Menu
+                id="menu-appbar"
+                anchorEl={anchorEl}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={Boolean(anchorEl)}
+                onClose={handleClose}
+              >
+                <MenuItem onClick={handleClose}>Profile</MenuItem>
+                <MenuItem onClick={handleClose}>My account</MenuItem>
+              </Menu>
+            </div>
+          )}
         </Toolbar>
       </AppBar>
       <Drawer variant="permanent" open={open}>
