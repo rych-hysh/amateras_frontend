@@ -1,10 +1,31 @@
-import { Box, Button, CircularProgress, Icon, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ListSubheader, MenuItem, Select, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Icon, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ListSubheader, MenuItem, Select, SelectChangeEvent, Typography } from "@mui/material";
 import { DataGrid, GridCellParams, GridColDef } from "@mui/x-data-grid";
 import { PlayCircle, StopCircle } from "@mui/icons-material";
 import { Chart } from "react-google-charts";
 import clsx from 'clsx'
 import "./simulator.scss"
 import { useEffect, useState } from "react";
+import PrivatePage from "../private-page";
+import { useAuth } from "../../auth/use-auth";
+
+interface Simulator {
+	id: number,
+	isRunning: boolean,
+	simulatorName: string,
+	userUuid: string
+}
+
+interface Positions{
+	id: number,
+	askOrBid: string,
+	atRate: number,
+	lots: number,
+	algorithmName: string,
+	profits: number,
+	atDate: String,
+	pair: String,
+	isSettled: boolean
+}
 
 export const data = [
 	["algorythm", "origin", "alg1", "alg2"],
@@ -43,11 +64,11 @@ export const data = [
 ];
 
 const PositionsColumns: GridColDef[] = [
-	{ field: 'aorb', headerName: '売買', flex: 1, minWidth: 60, headerAlign: 'center' },
-	{ field: 'atrate', headerName: '約定価格', flex: 1, minWidth: 100, headerAlign: 'center', type: 'number' },
+	{ field: 'askOrBid', headerName: '売買', flex: 1, minWidth: 60, headerAlign: 'center' },
+	{ field: 'atRate', headerName: '約定価格', flex: 1, minWidth: 100, headerAlign: 'center', type: 'number' },
 	{ field: 'lots', headerName: 'ロット数', flex: 1, minWidth: 100, headerAlign: 'center', type: 'number' },
 	{
-		field: 'plofits',
+		field: 'profits',
 		headerName: '損益',
 		flex: 0.8,
 		minWidth: 60,
@@ -61,8 +82,8 @@ const PositionsColumns: GridColDef[] = [
 			});
 		}
 	},
-	{ field: 'algorytms', headerName: '使用アルゴリズム', flex: 1.5, minWidth: 150, headerAlign: 'center' },
-	{ field: 'atdate', headerName: '取得日時', flex: 1.5, minWidth: 150, headerAlign: 'center' },
+	{ field: 'algorithmName', headerName: '使用アルゴリズム', flex: 1.5, minWidth: 150, headerAlign: 'center' },
+	{ field: 'atDate', headerName: '取得日時', flex: 1.5, minWidth: 150, headerAlign: 'center' },
 ]
 
 let positionsRows = [
@@ -98,27 +119,63 @@ const historyRows = [
 ]
 
 export function Simulator() {
-	let [state, setState] = useState(positionsRows);
-	let [positionLoading, setPositionsLoading] = useState(true);
-	let [historyLoading, setHistoryLoading] = useState(true);
-	fetch('http://localhost:3030/positions').then((res) => res.json()).then((res) => { setPositionsLoading(false) });
-	fetch('http://localhost:3030/history').then((res) => res.json()).then((res) => { setHistoryLoading(false) });
+	const [simulatorList, setSimulatorList] = useState([] as Simulator[])
+	const [simulatorId, setSimulatorId] = useState('0')
+	const [positions, setPositions] = useState([] as Positions[]);
+	const [fetching, setFetching] = useState(true);
+	const [positionLoading, setPositionsLoading] = useState(true);
+	const [historyLoading, setHistoryLoading] = useState(true);
+	const { sub, isLoading } = useAuth();
 
-	let simulatorId = 0;
+	const init = () => {
+		if(isLoading)return
+		let s = "http://localhost:8080/simulators/" + sub;
+		fetch(s).then((res) => res.json()).then((res: Simulator[]) => {
+			if (res.length == 0) {
+				console.log('invaild uuid');
+				return;
+			};
+			setSimulatorList(res);
+			setSimulatorId(res[0].id.toString())
+			setFetching(false);
+		});
+		fetch('http://localhost:3030/positions').then((res) => res.json()).then(() => setPositionsLoading(false));
+		fetch('http://localhost:3030/history').then((res) => res.json()).then(() => setHistoryLoading(false));
+	}
+
+	useEffect(() => {
+		init();
+	}, [isLoading]);
+
+	useEffect(()=>{
+		setPositionsLoading(true);
+		fetch('http://localhost:8080/positions/' + simulatorId).then((res) => res.json()).then((res: Positions[]) => {
+			setPositions(res);
+			setPositionsLoading(false);
+		})
+	}, [simulatorId])
+
+	const handleSimulatorChange = (event: SelectChangeEvent) => {
+		setSimulatorId(event.target.value as string);
+	}
 	return (
-		<>
+		<PrivatePage>
 			<div id="simulator-container">
 				<div id="simulator-outer">
 					<div id="selectSim" className="simulator-inner">
+						{fetching ? (<div className="simulatorsProgress"> <CircularProgress /> </div>) :
+							<Select
+								id="simulator-selector"
+								labelId="Simuletor"
+								value={simulatorId}
+								onChange={handleSimulatorChange}
+							>
+								{simulatorList.map((simulator) =>
+									<MenuItem key={simulator.id} value={simulator.id}>{simulator.simulatorName}</MenuItem>
+								)}
+							</Select>
+						}
 
-						<Select
-							id="simulator-selector"
-							labelId="Simuletor"
-							value={simulatorId}
-						>
-							<MenuItem value="0">Simulator 1</MenuItem>
-							<MenuItem value="1">Simulator 2</MenuItem>
-						</Select>
 						<div>
 							<IconButton>
 								<PlayCircle sx={{ fontSize: "60px", color: "#f00" }} />
@@ -166,7 +223,7 @@ export function Simulator() {
 							<div className="tableContainer">
 								<DataGrid
 									className="positionsTable"
-									rows={state}
+									rows={positions}
 									columns={PositionsColumns}
 									autoPageSize
 								// initialState={{
@@ -197,6 +254,6 @@ export function Simulator() {
 					</div>
 				</div>
 			</div>
-		</>
+		</PrivatePage>
 	)
 }

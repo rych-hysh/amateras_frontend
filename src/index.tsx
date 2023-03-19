@@ -4,6 +4,9 @@ import './index.css';
 import { MainAppBar } from './components/appbar/mainappbar';
 import reportWebVitals from './reportWebVitals';
 import { createTheme } from '@mui/system';
+import { initAuth } from './auth/config/auth';
+import { BrowserRouter } from 'react-router-dom';
+import { ProvideAuth } from './auth/use-auth';
 
 const darkTheme = createTheme({
   palette: {
@@ -11,12 +14,18 @@ const darkTheme = createTheme({
   },
 })
 
+initAuth();
+
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <MainAppBar />
+    <BrowserRouter>
+      <ProvideAuth>
+        <MainAppBar />
+      </ProvideAuth>
+    </BrowserRouter>
   </React.StrictMode>
 );
 

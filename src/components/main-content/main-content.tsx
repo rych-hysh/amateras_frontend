@@ -8,11 +8,14 @@ import { Setting } from '../settings/settings';
 import { GridTest } from '../grid-template/grid';
 import { GridTest2 } from '../grid-template/grid2';
 import { Landing } from "../landing/landing";
+import { SignIn } from "../../auth/sign-in/sign-in";
+import { SignUp } from "../../auth/sign-up/sign-up";
+import { ConfirmSignUp } from "../../auth/confirm-sign-up/confirm-sign-up";
+import { Profile } from "../profile/profile";
 
 export function MainContent() {
 	return (
 		<>
-			<BrowserRouter>
 				<Routes>
 					<Route path="/" element={<Landing />} />
 					<Route path='/charts' element={<Charts />} />
@@ -22,8 +25,11 @@ export function MainContent() {
 					<Route path='/settings' element={<Setting />} />
 					<Route path='/grid' element={<GridTest />} />
 					<Route path='/grid2' element={<GridTest2 />} />
+					<Route path="/signin" element={<SignIn />} />
+					<Route path="/signup" element={<SignUp />} />
+					<Route path="/cofirmsignup" element={<ConfirmSignUp />} />
+					<Route path="/profile" element={<Profile />} />
 				</Routes>
-			</BrowserRouter>
 		</>
 	);
 }
