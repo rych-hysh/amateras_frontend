@@ -150,8 +150,6 @@ export function Simulator() {
 	useEffect(()=>{
 		setPositionsLoading(true);
 		fetch('http://localhost:8080/positions/' + simulatorId).then((res) => res.json()).then((res: Positions[]) => {
-			console.log(res);
-			console.log(positionsRows);
 			setPositions(res);
 			setPositionsLoading(false);
 		})
