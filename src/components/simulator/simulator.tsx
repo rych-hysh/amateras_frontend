@@ -107,9 +107,9 @@ export function Simulator() {
 	const [historyLoading, setHistoryLoading] = useState(true);
 	const auth = useAuth();
 
-	fetch("http://localhost:8080/simulators/a" + auth.sub).then((res) => res.json()).then((res: any[]) => {
+	fetch("http://localhost:8080/simulators/" + auth.sub).then((res) => res.json()).then((res: any[]) => {
 		if(res.length == 0){
-			console.log('a');
+			console.log('invaild uuid');
 			return;
 		};
 		console.log(res)
