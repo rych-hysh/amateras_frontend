@@ -8,6 +8,13 @@ import { useEffect, useState } from "react";
 import PrivatePage from "../private-page";
 import { useAuth } from "../../auth/use-auth";
 
+interface Simulator {
+	id: number,
+	isRunning: boolean,
+	simulatorName: string,
+	userUuid: string
+}
+
 export const data = [
 	["algorythm", "origin", "alg1", "alg2"],
 	["Copper", 100, -8.94, 8], // RGB value
@@ -100,23 +107,34 @@ const historyRows = [
 ]
 
 export function Simulator() {
-	const [simulatorList, setSimulatorList] = useState([])
+	const [simulatorList, setSimulatorList] = useState([] as Simulator[])
 	const [simulatorId, setSimulatorId] = useState('0')
 	const [positions, setPositions] = useState(positionsRows);
+	const [fetching, setFetching] = useState(true);
 	const [positionLoading, setPositionsLoading] = useState(true);
 	const [historyLoading, setHistoryLoading] = useState(true);
-	const auth = useAuth();
+	const { sub, isLoading } = useAuth();
 
-	fetch("http://localhost:8080/simulators/" + auth.sub).then((res) => res.json()).then((res: any[]) => {
-		if(res.length == 0){
-			console.log('invaild uuid');
-			return;
-		};
-		console.log(res)
-	})
+	const init = () => {
+		if(isLoading)return
+		let s = "http://localhost:8080/simulators/" + sub;
+		fetch(s).then((res) => res.json()).then((res: Simulator[]) => {
+			if (res.length == 0) {
+				console.log('invaild uuid');
+				return;
+			};
+			console.log(res[0].id.toString());
+			setSimulatorList(res);
+			setSimulatorId(res[0].id.toString())
+			setFetching(false);
+		});
+		fetch('http://localhost:3030/positions').then((res) => res.json()).then(() => setPositionsLoading(false));
+		fetch('http://localhost:3030/history').then((res) => res.json()).then(() => setHistoryLoading(false));
+	}
 
-	fetch('http://localhost:3030/positions').then((res) => res.json()).then((res) => { setPositionsLoading(false) });
-	fetch('http://localhost:3030/history').then((res) => res.json()).then((res) => { setHistoryLoading(false) });
+	useEffect(() => {
+		init();
+	}, [isLoading]);
 
 	const handleSimulatorChange = (event: SelectChangeEvent) => {
 		setSimulatorId(event.target.value as string);
@@ -126,16 +144,19 @@ export function Simulator() {
 			<div id="simulator-container">
 				<div id="simulator-outer">
 					<div id="selectSim" className="simulator-inner">
+						{fetching ? (<div className="simulatorsProgress"> <CircularProgress /> </div>) :
+							<Select
+								id="simulator-selector"
+								labelId="Simuletor"
+								value={simulatorId}
+								onChange={handleSimulatorChange}
+							>
+								{simulatorList.map((simulator) =>
+									<MenuItem value={simulator.id}>{simulator.simulatorName}</MenuItem>
+								)}
+							</Select>
+						}
 
-						<Select
-							id="simulator-selector"
-							labelId="Simuletor"
-							value={simulatorId}
-							onChange={handleSimulatorChange}
-						>
-							<MenuItem value={0}>Simulator 1</MenuItem>
-							<MenuItem value={1}>Simulator 2</MenuItem>
-						</Select>
 						<div>
 							<IconButton>
 								<PlayCircle sx={{ fontSize: "60px", color: "#f00" }} />
