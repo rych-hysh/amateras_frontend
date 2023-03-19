@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, Icon, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ListSubheader, MenuItem, Select, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Icon, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ListSubheader, MenuItem, Select, SelectChangeEvent, Typography } from "@mui/material";
 import { DataGrid, GridCellParams, GridColDef } from "@mui/x-data-grid";
 import { PlayCircle, StopCircle } from "@mui/icons-material";
 import { Chart } from "react-google-charts";
@@ -6,6 +6,7 @@ import clsx from 'clsx'
 import "./simulator.scss"
 import { useEffect, useState } from "react";
 import PrivatePage from "../private-page";
+import { useAuth } from "../../auth/use-auth";
 
 export const data = [
 	["algorythm", "origin", "alg1", "alg2"],
@@ -99,13 +100,27 @@ const historyRows = [
 ]
 
 export function Simulator() {
+	const [simulatorList, setSimulatorList] = useState([])
+	const [simulatorId, setSimulatorId] = useState('0')
 	const [positions, setPositions] = useState(positionsRows);
 	const [positionLoading, setPositionsLoading] = useState(true);
 	const [historyLoading, setHistoryLoading] = useState(true);
+	const auth = useAuth();
+
+	fetch("http://localhost:8080/simulators/a" + auth.sub).then((res) => res.json()).then((res: any[]) => {
+		if(res.length == 0){
+			console.log('a');
+			return;
+		};
+		console.log(res)
+	})
+
 	fetch('http://localhost:3030/positions').then((res) => res.json()).then((res) => { setPositionsLoading(false) });
 	fetch('http://localhost:3030/history').then((res) => res.json()).then((res) => { setHistoryLoading(false) });
 
-	let simulatorId = 0;
+	const handleSimulatorChange = (event: SelectChangeEvent) => {
+		setSimulatorId(event.target.value as string);
+	}
 	return (
 		<PrivatePage>
 			<div id="simulator-container">
@@ -116,9 +131,10 @@ export function Simulator() {
 							id="simulator-selector"
 							labelId="Simuletor"
 							value={simulatorId}
+							onChange={handleSimulatorChange}
 						>
-							<MenuItem value="0">Simulator 1</MenuItem>
-							<MenuItem value="1">Simulator 2</MenuItem>
+							<MenuItem value={0}>Simulator 1</MenuItem>
+							<MenuItem value={1}>Simulator 2</MenuItem>
 						</Select>
 						<div>
 							<IconButton>
