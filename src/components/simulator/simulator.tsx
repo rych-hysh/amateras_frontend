@@ -123,7 +123,6 @@ export function Simulator() {
 				console.log('invaild uuid');
 				return;
 			};
-			console.log(res[0].id.toString());
 			setSimulatorList(res);
 			setSimulatorId(res[0].id.toString())
 			setFetching(false);
@@ -152,7 +151,7 @@ export function Simulator() {
 								onChange={handleSimulatorChange}
 							>
 								{simulatorList.map((simulator) =>
-									<MenuItem value={simulator.id}>{simulator.simulatorName}</MenuItem>
+									<MenuItem key={simulator.id} value={simulator.id}>{simulator.simulatorName}</MenuItem>
 								)}
 							</Select>
 						}
