@@ -99,9 +99,9 @@ const historyRows = [
 ]
 
 export function Simulator() {
-	let [state, setState] = useState(positionsRows);
-	let [positionLoading, setPositionsLoading] = useState(true);
-	let [historyLoading, setHistoryLoading] = useState(true);
+	const [positions, setPositions] = useState(positionsRows);
+	const [positionLoading, setPositionsLoading] = useState(true);
+	const [historyLoading, setHistoryLoading] = useState(true);
 	fetch('http://localhost:3030/positions').then((res) => res.json()).then((res) => { setPositionsLoading(false) });
 	fetch('http://localhost:3030/history').then((res) => res.json()).then((res) => { setHistoryLoading(false) });
 
@@ -167,7 +167,7 @@ export function Simulator() {
 							<div className="tableContainer">
 								<DataGrid
 									className="positionsTable"
-									rows={state}
+									rows={positions}
 									columns={PositionsColumns}
 									autoPageSize
 								// initialState={{
