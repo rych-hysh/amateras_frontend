@@ -15,6 +15,18 @@ interface Simulator {
 	userUuid: string
 }
 
+interface Positions{
+	id: number,
+	askOrBid: string,
+	atRate: number,
+	lots: number,
+	algorithmName: string,
+	profits: number,
+	atDate: String,
+	pair: String,
+	isSettled: boolean
+}
+
 export const data = [
 	["algorythm", "origin", "alg1", "alg2"],
 	["Copper", 100, -8.94, 8], // RGB value
@@ -52,11 +64,11 @@ export const data = [
 ];
 
 const PositionsColumns: GridColDef[] = [
-	{ field: 'aorb', headerName: '売買', flex: 1, minWidth: 60, headerAlign: 'center' },
-	{ field: 'atrate', headerName: '約定価格', flex: 1, minWidth: 100, headerAlign: 'center', type: 'number' },
+	{ field: 'askOrBid', headerName: '売買', flex: 1, minWidth: 60, headerAlign: 'center' },
+	{ field: 'atRate', headerName: '約定価格', flex: 1, minWidth: 100, headerAlign: 'center', type: 'number' },
 	{ field: 'lots', headerName: 'ロット数', flex: 1, minWidth: 100, headerAlign: 'center', type: 'number' },
 	{
-		field: 'plofits',
+		field: 'profits',
 		headerName: '損益',
 		flex: 0.8,
 		minWidth: 60,
@@ -70,8 +82,8 @@ const PositionsColumns: GridColDef[] = [
 			});
 		}
 	},
-	{ field: 'algorytms', headerName: '使用アルゴリズム', flex: 1.5, minWidth: 150, headerAlign: 'center' },
-	{ field: 'atdate', headerName: '取得日時', flex: 1.5, minWidth: 150, headerAlign: 'center' },
+	{ field: 'algorithmName', headerName: '使用アルゴリズム', flex: 1.5, minWidth: 150, headerAlign: 'center' },
+	{ field: 'atDate', headerName: '取得日時', flex: 1.5, minWidth: 150, headerAlign: 'center' },
 ]
 
 let positionsRows = [
@@ -109,7 +121,7 @@ const historyRows = [
 export function Simulator() {
 	const [simulatorList, setSimulatorList] = useState([] as Simulator[])
 	const [simulatorId, setSimulatorId] = useState('0')
-	const [positions, setPositions] = useState(positionsRows);
+	const [positions, setPositions] = useState([] as Positions[]);
 	const [fetching, setFetching] = useState(true);
 	const [positionLoading, setPositionsLoading] = useState(true);
 	const [historyLoading, setHistoryLoading] = useState(true);
@@ -134,6 +146,16 @@ export function Simulator() {
 	useEffect(() => {
 		init();
 	}, [isLoading]);
+
+	useEffect(()=>{
+		setPositionsLoading(true);
+		fetch('http://localhost:8080/positions/' + simulatorId).then((res) => res.json()).then((res: Positions[]) => {
+			console.log(res);
+			console.log(positionsRows);
+			setPositions(res);
+			setPositionsLoading(false);
+		})
+	}, [simulatorId])
 
 	const handleSimulatorChange = (event: SelectChangeEvent) => {
 		setSimulatorId(event.target.value as string);
