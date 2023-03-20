@@ -1,4 +1,4 @@
-import { Amplify, Auth } from "aws-amplify"
+import { Auth } from "aws-amplify"
 import React, { createContext, useContext, useEffect, useState } from "react"
 
 interface Result{
@@ -39,7 +39,7 @@ const useProvideAuth = () : UseAuth => {
 	const [password, setPassword] = useState('');
 	const [sub, setSub] = useState('');
 
-
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect(()=>{
 		setIsLoading(true);
 		Auth.currentAuthenticatedUser()
