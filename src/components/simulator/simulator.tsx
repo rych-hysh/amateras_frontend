@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, Icon, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ListSubheader, MenuItem, Select, SelectChangeEvent, Typography } from "@mui/material";
+import { Box, CircularProgress, IconButton, List, ListItem, ListItemText, ListSubheader, MenuItem, Select, SelectChangeEvent, Typography } from "@mui/material";
 import { DataGrid, GridCellParams, GridColDef } from "@mui/x-data-grid";
 import { PlayCircle, StopCircle } from "@mui/icons-material";
 import { Chart } from "react-google-charts";
@@ -8,14 +8,14 @@ import { useEffect, useState } from "react";
 import PrivatePage from "../private-page";
 import { useAuth } from "../../auth/use-auth";
 
-interface Simulator {
+interface Simulators {
 	id: number,
 	isRunning: boolean,
 	simulatorName: string,
 	userUuid: string
 }
 
-interface Positions{
+interface Positions {
 	id: number,
 	askOrBid: string,
 	atRate: number,
@@ -86,12 +86,6 @@ const PositionsColumns: GridColDef[] = [
 	{ field: 'atDate', headerName: '取得日時', flex: 1.5, minWidth: 150, headerAlign: 'center' },
 ]
 
-let positionsRows = [
-	{ id: 0, aorb: "ask", atrate: 130, lots: 3, algorytms: "algorytms 1", plofits: "-30", atdate: "1999/10/1 10:00:03" },
-	{ id: 1, aorb: "ask", atrate: 120, lots: 2, algorytms: "algorytms 2", plofits: "+20", atdate: "1999/10/3 12:03:21" },
-	{ id: 2, aorb: "bid", atrate: 130.5, lots: 2, algorytms: "algorytms 1", plofits: "+30", atdate: "1999/10/4 14:04:08" },
-]
-
 const historyColumns: GridColDef[] = [
 	{ field: 'algorytms', headerName: '使用アルゴリズム', flex: 1.5, minWidth: 150, headerAlign: 'center' },
 	{ field: 'lots', headerName: 'ロット数', flex: 1, minWidth: 100, headerAlign: 'center', type: 'number' },
@@ -119,7 +113,7 @@ const historyRows = [
 ]
 
 export function Simulator() {
-	const [simulatorList, setSimulatorList] = useState([] as Simulator[])
+	const [simulatorList, setSimulatorList] = useState([] as Simulators[])
 	const [simulatorId, setSimulatorId] = useState('0')
 	const [positions, setPositions] = useState([] as Positions[]);
 	const [fetching, setFetching] = useState(true);
@@ -128,10 +122,10 @@ export function Simulator() {
 	const { sub, isLoading } = useAuth();
 
 	const init = () => {
-		if(isLoading)return
+		if (isLoading) return
 		let s = "http://localhost:8080/simulators/" + sub;
-		fetch(s).then((res) => res.json()).then((res: Simulator[]) => {
-			if (res.length == 0) {
+		fetch(s).then((res) => res.json()).then((res: Simulators[]) => {
+			if (res.length === 0) {
 				console.log('invaild uuid');
 				return;
 			};
@@ -145,9 +139,10 @@ export function Simulator() {
 
 	useEffect(() => {
 		init();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [isLoading]);
 
-	useEffect(()=>{
+	useEffect(() => {
 		setPositionsLoading(true);
 		fetch('http://localhost:8080/positions/' + simulatorId).then((res) => res.json()).then((res: Positions[]) => {
 			setPositions(res);
@@ -157,6 +152,26 @@ export function Simulator() {
 
 	const handleSimulatorChange = (event: SelectChangeEvent) => {
 		setSimulatorId(event.target.value as string);
+	}
+	const checkRunnning = () =>{
+		if(fetching)return false;
+		return !simulatorList.filter((simulator) => simulator.id === parseInt(simulatorId))[0].isRunning;
+	}
+	const handlePlay = () => {
+		let simulator: Simulators = {} as Simulators;
+		simulator.id = parseInt(simulatorId);
+		simulator.isRunning = true;
+		simulator.simulatorName = simulatorList.filter((simulator) => simulator.id === parseInt(simulatorId))[0].simulatorName;
+		simulator.userUuid = sub;
+		fetch("http://localhost:8080/simulators/update", {method: "POST", headers: {"Accept": "application/json", "Content-Type": "application/json"}, body: JSON.stringify(simulator)}).then(() => init());
+	}
+	const handleStop = () => {
+		let simulator: Simulators = {} as Simulators;
+		simulator.id = parseInt(simulatorId);
+		simulator.isRunning = false;
+		simulator.simulatorName = simulatorList.filter((simulator) => simulator.id === parseInt(simulatorId))[0].simulatorName;
+		simulator.userUuid = sub;
+		fetch("http://localhost:8080/simulators/update", {method: "POST", headers: {"Accept": "application/json", "Content-Type": "application/json"}, body: JSON.stringify(simulator)}).then(() => init());
 	}
 	return (
 		<PrivatePage>
@@ -177,14 +192,18 @@ export function Simulator() {
 						}
 
 						<div>
-							<IconButton>
-								<PlayCircle sx={{ fontSize: "60px", color: "#f00" }} />
+							{ checkRunnning() ?
+								<IconButton onClick={handlePlay}>
+									<PlayCircle sx={{ fontSize: "60px", color: "#f00" }} />
 
-							</IconButton>
-							<IconButton>
-								<StopCircle sx={{ fontSize: "60px" }} />
+								</IconButton> :
+								<IconButton onClick={handleStop}>
+									<StopCircle sx={{ fontSize: "60px" }} />
 
-							</IconButton>
+								</IconButton>
+							}
+
+
 						</div>
 					</div>
 					<div id="PL" className="simulator-inner">
