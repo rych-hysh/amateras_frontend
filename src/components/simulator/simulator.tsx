@@ -1,5 +1,4 @@
-import { Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, List, ListItem, ListItemText, ListSubheader, MenuItem, Select, SelectChangeEvent, Typography } from "@mui/material";
-import { DataGrid, GridCellParams, GridColDef } from "@mui/x-data-grid";
+import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import { PlayCircle, StopCircle } from "@mui/icons-material";
 import { Chart } from "react-google-charts";
 import { useEffect, useState } from "react";
@@ -9,12 +8,12 @@ import { useAuth } from "../../auth/use-auth";
 
 import "./simulator.scss"
 import "./mockdata"
-import { data, historyColumns, historyRows, PositionsColumns } from "./mockdata";
+import { data } from "./mockdata";
 import { Positions } from "./positions/positions";
 import { History } from "./history/history";
 import { AlgorithmList } from "./algorithm-list/algorithm-list";
 
-interface Simulator {
+interface Simulators {
 
 	id: number,
 	isRunning: boolean,
@@ -71,7 +70,7 @@ export function Simulator() {
 	}
 
 	const handleSimulatorChange = (event: SelectChangeEvent) => {
-		setSimulatorId(event.target.value as string);
+		setSimulator(simulatorList.find(simulator => simulator.id === parseInt(event.target.value)));
 	}
   
   const checkRunnning = () => {
