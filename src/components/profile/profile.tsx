@@ -1,5 +1,4 @@
 import { Button } from "@mui/material";
-import { Auth } from "aws-amplify";
 import { useState } from "react";
 import { useAuth } from "../../auth/use-auth"
 
@@ -13,9 +12,7 @@ const Memo = (props: any) => {
 
 export function Profile(){
 	const [state, setState] = useState('');
-	const auth = useAuth();
 	const { sub } = useAuth();
-	let t: string = "";
 	const h = (e: any) => {
 		setState(e.target.value)
 	}

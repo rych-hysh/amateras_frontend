@@ -1,4 +1,4 @@
-import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 
 import { Charts } from '../charts/charts';
 import { Simulator } from '../simulator/simulator';

@@ -1,5 +1,5 @@
 import { CircularProgress } from "@mui/material";
-import { Navigate, useNavigate } from "react-router";
+import { Navigate } from "react-router";
 import { useAuth } from "../auth/use-auth";
 
 import './private-page.scss';

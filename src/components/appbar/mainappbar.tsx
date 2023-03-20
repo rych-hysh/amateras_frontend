@@ -24,7 +24,7 @@ import { BsCalculator, BsCodeSlash } from "react-icons/bs";
 import { IoMdNotifications } from "react-icons/io";
 
 import { MainContent } from '../main-content/main-content';
-import { BrowserRouter, Link, Navigate, useNavigate, Routes } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/use-auth';
 import { AccountCircle } from '@mui/icons-material';
 
@@ -114,7 +114,7 @@ export function MainAppBar() {
 
   const handleClose = (path: string) => {
     setAnchorEl(null);
-    if(path == "/charts") signOut();
+    if(path === "/charts") signOut();
     navigate(path)
   };
 
