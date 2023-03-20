@@ -1,7 +1,5 @@
-import { Auth } from "aws-amplify"
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { initAuth } from "../config/auth";
 import { useAuth } from "../use-auth";
 
 export function SignIn(){

@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, Icon, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ListSubheader, MenuItem, Select, SelectChangeEvent, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, List, ListItem, ListItemText, ListSubheader, MenuItem, Select, SelectChangeEvent, Typography } from "@mui/material";
 import { DataGrid, GridCellParams, GridColDef } from "@mui/x-data-grid";
 import { PlayCircle, StopCircle } from "@mui/icons-material";
 import { Chart } from "react-google-charts";
@@ -8,14 +8,14 @@ import { useEffect, useState } from "react";
 import PrivatePage from "../private-page";
 import { useAuth } from "../../auth/use-auth";
 
-interface Simulator {
+interface Simulators {
 	id: number,
 	isRunning: boolean,
 	simulatorName: string,
 	userUuid: string
 }
 
-interface Positions{
+interface Positions {
 	id: number,
 	askOrBid: string,
 	atRate: number,
@@ -86,12 +86,6 @@ const PositionsColumns: GridColDef[] = [
 	{ field: 'atDate', headerName: '取得日時', flex: 1.5, minWidth: 150, headerAlign: 'center' },
 ]
 
-let positionsRows = [
-	{ id: 0, aorb: "ask", atrate: 130, lots: 3, algorytms: "algorytms 1", plofits: "-30", atdate: "1999/10/1 10:00:03" },
-	{ id: 1, aorb: "ask", atrate: 120, lots: 2, algorytms: "algorytms 2", plofits: "+20", atdate: "1999/10/3 12:03:21" },
-	{ id: 2, aorb: "bid", atrate: 130.5, lots: 2, algorytms: "algorytms 1", plofits: "+30", atdate: "1999/10/4 14:04:08" },
-]
-
 const historyColumns: GridColDef[] = [
 	{ field: 'algorytms', headerName: '使用アルゴリズム', flex: 1.5, minWidth: 150, headerAlign: 'center' },
 	{ field: 'lots', headerName: 'ロット数', flex: 1, minWidth: 100, headerAlign: 'center', type: 'number' },
@@ -119,55 +113,93 @@ const historyRows = [
 ]
 
 export function Simulator() {
-	const [simulatorList, setSimulatorList] = useState([] as Simulator[])
-	const [simulatorId, setSimulatorId] = useState('0')
+	const [simulatorList, setSimulatorList] = useState([] as Simulators[]);
+	const [simulator, setSimulator] = useState({
+		id: -1,
+		simulatorName: '',
+		isRunning: false,
+		userUuid: ''
+	} as Simulators | undefined);
 	const [positions, setPositions] = useState([] as Positions[]);
-	const [fetching, setFetching] = useState(true);
+	const [simulatorLoading, setSimulatorLoading] = useState(true);
 	const [positionLoading, setPositionsLoading] = useState(true);
 	const [historyLoading, setHistoryLoading] = useState(true);
+
+	const [confirmPlayOpen, setConfirmPlayOpen] = useState(false);
+	const [confirmStopOpen, setConfirmStopOpen] = useState(false);
 	const { sub, isLoading } = useAuth();
 
 	const init = () => {
-		if(isLoading)return
+		if (isLoading) return
 		let s = "http://localhost:8080/simulators/" + sub;
-		fetch(s).then((res) => res.json()).then((res: Simulator[]) => {
-			if (res.length == 0) {
+		setSimulatorLoading(true);
+		fetch(s).then((res) => res.json()).then((res: Simulators[]) => {
+			if (res.length === 0) {
 				console.log('invaild uuid');
 				return;
 			};
 			setSimulatorList(res);
-			setSimulatorId(res[0].id.toString())
-			setFetching(false);
+			setSimulator(res[0]);
+			setSimulatorLoading(false);
 		});
+		setPositionsLoading(true);
 		fetch('http://localhost:3030/positions').then((res) => res.json()).then(() => setPositionsLoading(false));
+		setHistoryLoading(true);
 		fetch('http://localhost:3030/history').then((res) => res.json()).then(() => setHistoryLoading(false));
 	}
 
 	useEffect(() => {
 		init();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [isLoading]);
 
-	useEffect(()=>{
+	useEffect(() => {
 		setPositionsLoading(true);
-		fetch('http://localhost:8080/positions/' + simulatorId).then((res) => res.json()).then((res: Positions[]) => {
+		fetch('http://localhost:8080/positions/' + simulator!.id).then((res) => res.json()).then((res: Positions[]) => {
 			setPositions(res);
 			setPositionsLoading(false);
 		})
-	}, [simulatorId])
+	}, [simulator])
 
 	const handleSimulatorChange = (event: SelectChangeEvent) => {
-		setSimulatorId(event.target.value as string);
+		setSimulator(simulatorList.find(simulator => simulator.id === parseInt(event.target.value)));
+	}
+
+	const checkRunnning = () => {
+		if (simulatorLoading) return false;
+		return !simulator?.isRunning;
+	}
+	const handlePlay = () => {
+		if(simulator === undefined ) return;
+		let new_simulator: Simulators = {} as Simulators;
+		new_simulator.id = simulator.id;
+		new_simulator.isRunning = true;
+		new_simulator.simulatorName = simulator.simulatorName;
+		new_simulator.userUuid = sub;
+		setSimulatorLoading(true);
+		fetch("http://localhost:8080/simulators/update", { method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" }, body: JSON.stringify(new_simulator) }).then(() => init());
+		setConfirmPlayOpen(false);
+	}
+	const handleStop = () => {
+		if(simulator === undefined ) return;
+		let new_simulator: Simulators = {} as Simulators;
+		new_simulator.id = simulator.id;
+		new_simulator.isRunning = false;
+		new_simulator.simulatorName = simulator.simulatorName;
+		new_simulator.userUuid = sub;
+		fetch("http://localhost:8080/simulators/update", { method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" }, body: JSON.stringify(new_simulator) }).then(() => init());
+		setConfirmStopOpen(false);
 	}
 	return (
 		<PrivatePage>
 			<div id="simulator-container">
 				<div id="simulator-outer">
 					<div id="selectSim" className="simulator-inner">
-						{fetching ? (<div className="simulatorsProgress"> <CircularProgress /> </div>) :
+						{simulatorLoading ? (<div className="simulatorsProgress"> <CircularProgress /> </div>) :
 							<Select
 								id="simulator-selector"
 								labelId="Simuletor"
-								value={simulatorId}
+								value={simulator!.id.toString()}
 								onChange={handleSimulatorChange}
 							>
 								{simulatorList.map((simulator) =>
@@ -177,15 +209,61 @@ export function Simulator() {
 						}
 
 						<div>
-							<IconButton>
-								<PlayCircle sx={{ fontSize: "60px", color: "#f00" }} />
+							{checkRunnning() ?
+								<IconButton onClick={() => setConfirmPlayOpen(true)}>
+									<PlayCircle sx={{ fontSize: "60px", color: "#f00" }} />
 
-							</IconButton>
-							<IconButton>
-								<StopCircle sx={{ fontSize: "60px" }} />
+								</IconButton> :
+								<IconButton onClick={() => setConfirmStopOpen(true)}>
+									<StopCircle sx={{ fontSize: "60px" }} />
 
-							</IconButton>
+								</IconButton>
+							}
+
+
 						</div>
+						<Dialog
+							open={confirmPlayOpen}
+							onClose={() => setConfirmPlayOpen(false)}
+							aria-labelledby="alert-dialog-title"
+							aria-describedby="alert-dialog-description"
+						>
+							<DialogTitle id="alert-dialog-title">
+								{"Start simulator?"}
+							</DialogTitle>
+							<DialogContent>
+								<DialogContentText id="alert-dialog-description">
+									Dou you want to start {simulator?.simulatorName} ?
+								</DialogContentText>
+							</DialogContent>
+							<DialogActions>
+								<Button onClick={() => setConfirmPlayOpen(false)}>Cancel</Button>
+								<Button onClick={handlePlay} autoFocus>
+									Start
+								</Button>
+							</DialogActions>
+						</Dialog>
+						<Dialog
+							open={confirmStopOpen}
+							onClose={() => setConfirmStopOpen(false)}
+							aria-labelledby="alert-dialog-title"
+							aria-describedby="alert-dialog-description"
+						>
+							<DialogTitle id="alert-dialog-title">
+								{"Stop simulator?"}
+							</DialogTitle>
+							<DialogContent>
+								<DialogContentText id="alert-dialog-description">
+									Dou you want to stop {simulator?.simulatorName} ?
+								</DialogContentText>
+							</DialogContent>
+							<DialogActions>
+								<Button onClick={() => setConfirmStopOpen(false)}>Cancel</Button>
+								<Button onClick={handleStop} autoFocus>
+									Stop
+								</Button>
+							</DialogActions>
+						</Dialog>
 					</div>
 					<div id="PL" className="simulator-inner">
 						<Chart

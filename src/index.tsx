@@ -3,16 +3,9 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import { MainAppBar } from './components/appbar/mainappbar';
 import reportWebVitals from './reportWebVitals';
-import { createTheme } from '@mui/system';
 import { initAuth } from './auth/config/auth';
 import { BrowserRouter } from 'react-router-dom';
 import { ProvideAuth } from './auth/use-auth';
-
-const darkTheme = createTheme({
-  palette: {
-    mode: 'dark',
-  },
-})
 
 initAuth();
 
