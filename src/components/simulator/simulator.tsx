@@ -16,6 +16,7 @@ import { ConfirmStopDialog } from "./dialogs/confirm-stop-dialog";
 // @ts-ignore
 import Positions from "../../intefaces/positions";
 import Simulators from "../../intefaces/simulators";
+import { isRouteErrorResponse } from "react-router";
 
 export function Simulator() {
 	const [simulatorList, setSimulatorList] = useState([] as Simulators[]);
@@ -27,9 +28,11 @@ export function Simulator() {
 
 	const [confirmPlayOpen, setConfirmPlayOpen] = useState(false);
 	const [confirmStopOpen, setConfirmStopOpen] = useState(false);
+	const [editNameOpen, setEditNameOpen] = useState(false);
+	const [addSimulatorOpen, setAddSimulatorOpen] = useState(false);
 	const { sub, isLoading } = useAuth();
 
-	const init = (simulatorId: number | null = null) => {
+	const init = (simulatorId: number | null = null, getLast: boolean = false) => {
 		if (isLoading) return;
 		let url = "http://localhost:8080/simulators/" + sub;
 		setSimulatorLoading(true);
@@ -62,20 +65,41 @@ export function Simulator() {
 
 	const handleSimulatorUpdate = (isRunning: boolean) => {
 		if (simulator === undefined) return;
-		let new_simulator: Simulators = {} as Simulators;
-		new_simulator.id = simulator.id;
-		new_simulator.isRunning = isRunning;
-		new_simulator.simulatorName = simulator.simulatorName;
-		new_simulator.userUuid = sub;
-		let new_simulatorList = simulatorList;
-		let old_simulator = new_simulatorList.find(simulator => simulator.id === new_simulator.id);
-		if (old_simulator === undefined) return;
-		old_simulator.isRunning = isRunning;
-		setSimulator(new_simulator);
-		setSimulatorList(new_simulatorList);
-		fetch("http://localhost:8080/simulators/update", { method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" }, body: JSON.stringify(new_simulator) });
+		updateSimulator({id: simulator?.id, isRunning: isRunning, simulatorName: simulator?.simulatorName, userUuid: sub});
 		setConfirmPlayOpen(false);
 		setConfirmStopOpen(false);
+	}
+
+	const editSimulatorName = (name: string) => {
+		if (simulator === undefined) return;
+		updateSimulator({id: simulator.id, isRunning: simulator.isRunning, simulatorName: name, userUuid: sub});
+		setEditNameOpen(false);
+	}
+
+	const addSimulator = (name: string) => {
+		if(simulator === undefined) return;
+		const PLACE_HOLDER_NUM = 0;
+		updateSimulator({id: PLACE_HOLDER_NUM, isRunning: true, simulatorName: name, userUuid: sub}, true);
+	}
+
+	const updateSimulator = (_new: Simulators, isAdd: boolean = false) => {
+		let new_simulatorList = simulatorList;
+		let body: any = _new;
+		if(isAdd){
+			body.id = null;
+		}else{
+			let old_simulator = new_simulatorList.find(sim => sim.id === _new.id);
+			if( old_simulator === undefined ) return; //TODO: error handling
+			old_simulator = _new;
+		}
+		fetch("http://localhost:8080/simulators/update", { method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" }, body: JSON.stringify(_new) }).then(() => {
+			setSimulator(_new);
+			setSimulatorList(new_simulatorList);
+		}).then(() =>{
+			if(isAdd){
+				init(null, true);
+			}
+		});
 	}
 
 	useEffect(() => {
