@@ -1,4 +1,4 @@
-import { Button, CircularProgress, IconButton, MenuItem, Select, SelectChangeEvent } from "@mui/material";
+import { Alert, Button, CircularProgress, IconButton, MenuItem, Select, SelectChangeEvent, Snackbar } from "@mui/material";
 import { PlayCircle, StopCircle } from "@mui/icons-material";
 import { Chart } from "react-google-charts";
 import { useEffect, useState } from "react";
@@ -7,16 +7,15 @@ import { useAuth } from "../../auth/use-auth";
 
 
 import "./simulator.scss"
-import { data, mockSimulator } from "./mockdata";
-import { PositionsList } from "./positions/positions-list";
-import { History } from "./history/history";
-import { AlgorithmList } from "./algorithm-list/algorithm-list";
-import { ConfirmPlayDialog } from "./dialogs/confirm-play-dialog";
-import { ConfirmStopDialog } from "./dialogs/confirm-stop-dialog";
-// @ts-ignore
-import Positions from "../../intefaces/positions";
-import Simulators from "../../intefaces/simulators";
-import { isRouteErrorResponse } from "react-router";
+import { data, mockSimulator } from "./mockdata";// @ts-ignore
+import { PositionsList } from "./positions/positions-list";// @ts-ignore
+import { History } from "./history/history";// @ts-ignore
+import { AlgorithmList } from "./algorithm-list/algorithm-list";// @ts-ignore
+import { ConfirmPlayDialog } from "./dialogs/confirm-play-dialog";// @ts-ignore
+import { ConfirmStopDialog } from "./dialogs/confirm-stop-dialog";// @ts-ignore
+import Positions from "../../intefaces/positions";// @ts-ignore
+import Simulators from "../../intefaces/simulators";// @ts-ignore
+import { EditNameDialog } from "./dialogs/edit-name-dialog";// @ts-ignore
 
 export function Simulator() {
 	const [simulatorList, setSimulatorList] = useState([] as Simulators[]);
@@ -30,6 +29,8 @@ export function Simulator() {
 	const [confirmStopOpen, setConfirmStopOpen] = useState(false);
 	const [editNameOpen, setEditNameOpen] = useState(false);
 	const [addSimulatorOpen, setAddSimulatorOpen] = useState(false);
+	const [nameNullAlertOpen, setNameNullAlertOpen] = useState(false);
+	const [nameChangedAlertOpen, setNameChangedAlertOpen] = useState(false);
 	const { sub, isLoading } = useAuth();
 
 	const init = (simulatorId: number | null = null, getLast: boolean = false) => {
@@ -71,10 +72,22 @@ export function Simulator() {
 	}
 
 	const editSimulatorName = (name: string) => {
+		if(name === undefined || name === ""){
+			setEditNameOpen(false);
+			setNameNullAlertOpen(true);
+			return 
+		}
 		if (simulator === undefined) return;
 		updateSimulator({id: simulator.id, isRunning: simulator.isRunning, simulatorName: name, userUuid: sub});
 		setEditNameOpen(false);
 	}
+	const nameNullAlert = (
+		<Snackbar open={nameNullAlertOpen} onClose={() => setNameNullAlertOpen(false)}>
+			<Alert severity="error">
+				Please enter simulator name!
+			</Alert>
+		</Snackbar>
+	);
 
 	const addSimulator = (name: string) => {
 		if(simulator === undefined) return;
@@ -88,9 +101,9 @@ export function Simulator() {
 		if(isAdd){
 			body.id = null;
 		}else{
-			let old_simulator = new_simulatorList.find(sim => sim.id === _new.id);
-			if( old_simulator === undefined ) return; //TODO: error handling
-			old_simulator = _new;
+			let old_simulatorIndex = new_simulatorList.findIndex(sim => sim.id === _new.id);
+			if( old_simulatorIndex === undefined ) return; //TODO: error handling
+			new_simulatorList.splice(old_simulatorIndex, 1, _new);
 		}
 		fetch("http://localhost:8080/simulators/update", { method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" }, body: JSON.stringify(_new) }).then(() => {
 			setSimulator(_new);
@@ -153,7 +166,9 @@ export function Simulator() {
 					</div>
 					<ConfirmPlayDialog confirmPlayOpen={confirmPlayOpen} setConfirmPlayOpen={setConfirmPlayOpen} simulator={simulator!} handlePlay={handleSimulatorUpdate.bind(null, true)} />
 					<ConfirmStopDialog confirmStopOpen={confirmStopOpen} setConfirmStopOpen={setConfirmStopOpen} simulator={simulator!} handleStop={handleSimulatorUpdate.bind(null, false)} />
-					<Button id="edit-name" variant="outlined">edit name</Button>
+					<Button id="edit-name" variant="outlined" onClick={() => setEditNameOpen(true)}>edit name</Button>
+					<EditNameDialog originalName={simulator?.simulatorName} editNameOpen={editNameOpen} setEditNameOpen={setEditNameOpen} editSimulatorName={editSimulatorName}></EditNameDialog>
+					{nameNullAlert}
 					<Button id="add-new-sim" variant="contained">Add new simulator</Button>
 				</div>
 				<div id="PL" className="simulator-inner">
