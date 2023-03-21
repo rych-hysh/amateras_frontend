@@ -7,42 +7,19 @@ import { useAuth } from "../../auth/use-auth";
 
 
 import "./simulator.scss"
-import "./mockdata"
-import { data } from "./mockdata";
+import { data, mockSimulator } from "./mockdata";
 import { PositionsList } from "./positions/positions-list";
 import { History } from "./history/history";
 import { AlgorithmList } from "./algorithm-list/algorithm-list";
 import { ConfirmPlayDialog } from "./dialogs/confirm-play-dialog";
 import { ConfirmStopDialog } from "./dialogs/confirm-stop-dialog";
-
-interface Simulators {
-
-	id: number,
-	isRunning: boolean,
-	simulatorName: string,
-	userUuid: string
-}
-
-interface Positions {
-	id: number,
-	askOrBid: string,
-	atRate: number,
-	lots: number,
-	algorithmName: string,
-	profits: number,
-	atDate: String,
-	pair: String,
-	isSettled: boolean
-}
+// @ts-ignore
+import Positions from "../../intefaces/positions";
+import Simulators from "../../intefaces/simulators";
 
 export function Simulator() {
 	const [simulatorList, setSimulatorList] = useState([] as Simulators[]);
-	const [simulator, setSimulator] = useState({
-		id: -1,
-		simulatorName: '',
-		isRunning: false,
-		userUuid: ''
-	} as Simulators | undefined);
+	const [simulator, setSimulator] = useState(mockSimulator as Simulators | undefined);
 	const [positions, setPositions] = useState([] as Positions[]);
 	const [simulatorLoading, setSimulatorLoading] = useState(true);
 	const [positionLoading, setPositionsLoading] = useState(true);
@@ -80,8 +57,6 @@ export function Simulator() {
 	}
 
 	const checkRunnning = () => {
-		console.log(simulator)
-		console.log("simulator")
 		return simulator?.isRunning;
 	}
 
@@ -98,7 +73,7 @@ export function Simulator() {
 		old_simulator.isRunning = isRunning;
 		setSimulator(new_simulator);
 		setSimulatorList(new_simulatorList);
-		fetch("http://localhost:8080/simulators/update", { method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" }, body: JSON.stringify(new_simulator) })//.then(() => init(simulator.id));
+		fetch("http://localhost:8080/simulators/update", { method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" }, body: JSON.stringify(new_simulator) });
 		setConfirmPlayOpen(false);
 		setConfirmStopOpen(false);
 	}

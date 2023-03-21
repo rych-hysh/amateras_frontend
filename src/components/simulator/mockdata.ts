@@ -91,3 +91,10 @@ export const historyRows = [
 	{ id: 0, lots: 3, algorytms: "algorytms 1", plofits: "-30", atdate: "1999/10/1 10:00:03" },
 	{ id: 1, lots: 2, algorytms: "algorytms 2", plofits: "+20", atdate: "1999/10/3 12:03:21" },
 ]
+
+export const mockSimulator = {
+	id: -1,
+	simulatorName: '',
+	isRunning: false,
+	userUuid: ''
+};
