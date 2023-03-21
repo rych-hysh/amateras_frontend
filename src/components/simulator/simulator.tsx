@@ -1,4 +1,4 @@
-import { CircularProgress, IconButton, MenuItem, Select, SelectChangeEvent } from "@mui/material";
+import { Button, CircularProgress, IconButton, MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import { PlayCircle, StopCircle } from "@mui/icons-material";
 import { Chart } from "react-google-charts";
 import { useEffect, useState } from "react";
@@ -61,7 +61,7 @@ export function Simulator() {
 				console.log('invaild uuid');
 				return;
 			};
-			if(!simulatorId) simulatorId = res[0].id;
+			if (!simulatorId) simulatorId = res[0].id;
 			setSimulatorList(res);
 			setSimulator(simulatorList.find(simulator => simulator.id === simulatorId));
 			setSimulatorLoading(false);
@@ -78,15 +78,15 @@ export function Simulator() {
 	const handleSimulatorChange = (event: SelectChangeEvent) => {
 		setSimulator(simulatorList.find(simulator => simulator.id === parseInt(event.target.value)));
 	}
-  
-  const checkRunnning = () => {
+
+	const checkRunnning = () => {
 		console.log(simulator)
 		console.log("simulator")
 		return simulator?.isRunning;
 	}
 
 	const handleSimulatorUpdate = (isRunning: boolean) => {
-		if(simulator === undefined ) return;
+		if (simulator === undefined) return;
 		let new_simulator: Simulators = {} as Simulators;
 		new_simulator.id = simulator.id;
 		new_simulator.isRunning = isRunning;
@@ -94,7 +94,7 @@ export function Simulator() {
 		new_simulator.userUuid = sub;
 		let new_simulatorList = simulatorList;
 		let old_simulator = new_simulatorList.find(simulator => simulator.id === new_simulator.id);
-		if( old_simulator === undefined) return;
+		if (old_simulator === undefined) return;
 		old_simulator.isRunning = isRunning;
 		setSimulator(new_simulator);
 		setSimulatorList(new_simulatorList);
@@ -109,7 +109,7 @@ export function Simulator() {
 	}, [isLoading]);
 
 	useEffect(() => {
-		if(simulator === undefined) {
+		if (simulator === undefined) {
 			setSimulator(simulatorList[0])
 			return
 		};
@@ -124,53 +124,51 @@ export function Simulator() {
 
 	return (
 		<PrivatePage>
-			<div id="simulator-container">
-				<div id="simulator-outer">
-					<div id="selectSim" className="simulator-inner">
-						{simulatorLoading ? (<div className="simulatorsProgress"> <CircularProgress /> </div>) :
-							<Select
-								id="simulator-selector"
-								labelId="Simuletor"
-								value={simulator !== undefined ? simulator?.id.toString(): ""}
-								onChange={handleSimulatorChange}
-							>
-								{simulatorList.map((simulator) =>
-									<MenuItem key={simulator.id} value={simulator.id}>{simulator.simulatorName}</MenuItem>
-								)}
-							</Select>
+			<div id="simulator-outer">
+				<div id="selectSim" className="simulator-inner">
+					<span id="simulator-label">Simulator : </span>
+					{simulatorLoading ? (<div className="simulatorsProgress"> <CircularProgress /> </div>) :
+						<Select
+							id="simulator-selector"
+							labelId="Simuletor"
+							value={simulator !== undefined ? simulator?.id.toString() : ""}
+							onChange={handleSimulatorChange}
+						>
+							{simulatorList.map((sim) =>
+								<MenuItem key={sim.id} value={sim.id}>{sim.simulatorName} </MenuItem>
+							)}
+						</Select>
+					}
+
+					<div>
+						{!checkRunnning() ?
+							<IconButton onClick={() => setConfirmPlayOpen(true)}>
+								<PlayCircle sx={{ fontSize: "60px", color: "#f00" }} />
+
+							</IconButton> :
+							<IconButton onClick={() => setConfirmStopOpen(true)}>
+								<StopCircle sx={{ fontSize: "60px" }} />
+
+							</IconButton>
 						}
-
-						<div>
-							{ !checkRunnning() ?
-								<IconButton onClick={() => setConfirmPlayOpen(true)}>
-									<PlayCircle sx={{ fontSize: "60px", color: "#f00" }} />
-
-								</IconButton> :
-								<IconButton onClick={() => setConfirmStopOpen(true)}>
-									<StopCircle sx={{ fontSize: "60px" }} />
-
-								</IconButton>
-							}
-
-
-						</div>
-						<ConfirmPlayDialog confirmPlayOpen={confirmPlayOpen} setConfirmPlayOpen={setConfirmPlayOpen} simulator={simulator!} handlePlay={handleSimulatorUpdate.bind(null, true)} />
-						<ConfirmStopDialog confirmStopOpen={confirmStopOpen} setConfirmStopOpen={setConfirmStopOpen} simulator={simulator!} handleStop={handleSimulatorUpdate.bind(null, false)} />
-
 					</div>
-					<div id="PL" className="simulator-inner">
-						<Chart
-							chartType="SteppedAreaChart"
-							width="100%"
-							height="100%"
-							data={data}
-							options={{ isStacked: true }}
-						/>
-					</div>
-					<AlgorithmList />
-					<PositionsList positionLoading={positionLoading} positions={positions} />
-					<History historyLoading={historyLoading} />
+					<ConfirmPlayDialog confirmPlayOpen={confirmPlayOpen} setConfirmPlayOpen={setConfirmPlayOpen} simulator={simulator!} handlePlay={handleSimulatorUpdate.bind(null, true)} />
+					<ConfirmStopDialog confirmStopOpen={confirmStopOpen} setConfirmStopOpen={setConfirmStopOpen} simulator={simulator!} handleStop={handleSimulatorUpdate.bind(null, false)} />
+					<Button id="edit-name" variant="outlined">edit name</Button>
+					<Button id="add-new-sim" variant="contained">Add new simulator</Button>
 				</div>
+				<div id="PL" className="simulator-inner">
+					<Chart
+						chartType="SteppedAreaChart"
+						width="100%"
+						height="100%"
+						data={data}
+						options={{ isStacked: true }}
+					/>
+				</div>
+				<AlgorithmList />
+				<PositionsList positionLoading={positionLoading} positions={positions} />
+				<History historyLoading={historyLoading} />
 			</div>
 		</PrivatePage>
 	)

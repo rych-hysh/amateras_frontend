@@ -1,17 +1,15 @@
-#simulator-container{
-	height: calc(100vh - 65px);
-	width: calc(100vw - 65px);
-}
-
 #simulator-outer{
 	margin: auto;
 	display: grid;
-	height: 100%;
+	height: calc(100vh - 65px);
+	width: calc(100vw - 65px);
+	min-width: 800px;
 	grid-template-columns: 5fr 3fr 2fr;
 	grid-template-rows: 100px 60% 1fr;
 }
 
 .simulator-inner{
+	border-style: dashed;
 	// align-items: center;
 }
 
@@ -26,16 +24,30 @@
 	grid-row: 1/2;
 	align-items: center;
 	display: grid;
-	grid-template-columns: 300px 1fr;
+	grid-template-columns: 100px 300px 80px 120px 1fr 200px;
+}
+
+#simulator-label{
+	margin-left: 10px;
 }
 
 #simulator-selector{
-	margin-left: 10px;
+	grid-column: 2/3;
+	grid-row: 1/2;
 }
 
 .playIcon {
 	display: inline;
 	margin-left: 30px;
+}
+
+#edit-name{
+	grid-column: 4/5;
+}
+
+#add-new-sim{
+	grid-column: 6/7;
+	margin-right: 10px
 }
 
 #PL{
