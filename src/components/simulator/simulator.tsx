@@ -1,4 +1,4 @@
-import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, MenuItem, Select, SelectChangeEvent } from "@mui/material";
+import { CircularProgress, IconButton, MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import { PlayCircle, StopCircle } from "@mui/icons-material";
 import { Chart } from "react-google-charts";
 import { useEffect, useState } from "react";
@@ -9,9 +9,11 @@ import { useAuth } from "../../auth/use-auth";
 import "./simulator.scss"
 import "./mockdata"
 import { data } from "./mockdata";
-import { Positions } from "./positions/positions";
+import { PositionsList } from "./positions/positions-list";
 import { History } from "./history/history";
 import { AlgorithmList } from "./algorithm-list/algorithm-list";
+import { ConfirmPlayDialog } from "./dialogs/confirm-play-dialog";
+import { ConfirmStopDialog } from "./dialogs/confirm-stop-dialog";
 
 interface Simulators {
 
@@ -50,21 +52,25 @@ export function Simulator() {
 	const [confirmStopOpen, setConfirmStopOpen] = useState(false);
 	const { sub, isLoading } = useAuth();
 
-	const init = () => {
-		if (isLoading) return
-		let s = "http://localhost:8080/simulators/" + sub;
+	const init = (simulatorId: number | null = null) => {
+		if (isLoading) return;
+		let url = "http://localhost:8080/simulators/" + sub;
 		setSimulatorLoading(true);
-		fetch(s).then((res) => res.json()).then((res: Simulators[]) => {
+		fetch(url).then((res) => res.json()).then((res: Simulators[]) => {
 			if (res.length === 0) {
 				console.log('invaild uuid');
 				return;
 			};
+			if(!simulatorId) simulatorId = res[0].id;
 			setSimulatorList(res);
-			setSimulator(res[0]);
+			setSimulator(simulatorList.find(simulator => simulator.id === simulatorId));
 			setSimulatorLoading(false);
 		});
 		setPositionsLoading(true);
-		fetch('http://localhost:3030/positions').then((res) => res.json()).then(() => setPositionsLoading(false));
+		fetch('http://localhost:8080/positions/' + simulator!.id).then((res) => res.json()).then((res: Positions[]) => {
+			setPositions(res);
+			setPositionsLoading(false);
+		})
 		setHistoryLoading(true);
 		fetch('http://localhost:3030/history').then((res) => res.json()).then(() => setHistoryLoading(false));
 	}
@@ -74,30 +80,26 @@ export function Simulator() {
 	}
   
   const checkRunnning = () => {
-		if (simulatorLoading) return false;
-		return !simulator?.isRunning;
+		console.log(simulator)
+		console.log("simulator")
+		return simulator?.isRunning;
 	}
-  
-	const handlePlay = () => {
+
+	const handleSimulatorUpdate = (isRunning: boolean) => {
 		if(simulator === undefined ) return;
 		let new_simulator: Simulators = {} as Simulators;
 		new_simulator.id = simulator.id;
-		new_simulator.isRunning = true;
+		new_simulator.isRunning = isRunning;
 		new_simulator.simulatorName = simulator.simulatorName;
 		new_simulator.userUuid = sub;
-		setSimulatorLoading(true);
-		fetch("http://localhost:8080/simulators/update", { method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" }, body: JSON.stringify(new_simulator) }).then(() => init());
+		let new_simulatorList = simulatorList;
+		let old_simulator = new_simulatorList.find(simulator => simulator.id === new_simulator.id);
+		if( old_simulator === undefined) return;
+		old_simulator.isRunning = isRunning;
+		setSimulator(new_simulator);
+		setSimulatorList(new_simulatorList);
+		fetch("http://localhost:8080/simulators/update", { method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" }, body: JSON.stringify(new_simulator) })//.then(() => init(simulator.id));
 		setConfirmPlayOpen(false);
-	}
-  
-	const handleStop = () => {
-		if(simulator === undefined ) return;
-		let new_simulator: Simulators = {} as Simulators;
-		new_simulator.id = simulator.id;
-		new_simulator.isRunning = false;
-		new_simulator.simulatorName = simulator.simulatorName;
-		new_simulator.userUuid = sub;
-		fetch("http://localhost:8080/simulators/update", { method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" }, body: JSON.stringify(new_simulator) }).then(() => init());
 		setConfirmStopOpen(false);
 	}
 
@@ -107,11 +109,16 @@ export function Simulator() {
 	}, [isLoading]);
 
 	useEffect(() => {
+		if(simulator === undefined) {
+			setSimulator(simulatorList[0])
+			return
+		};
 		setPositionsLoading(true);
 		fetch('http://localhost:8080/positions/' + simulator!.id).then((res) => res.json()).then((res: Positions[]) => {
 			setPositions(res);
 			setPositionsLoading(false);
 		})
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [simulator])
 
 
@@ -124,7 +131,7 @@ export function Simulator() {
 							<Select
 								id="simulator-selector"
 								labelId="Simuletor"
-								value={simulator!.id.toString()}
+								value={simulator !== undefined ? simulator?.id.toString(): ""}
 								onChange={handleSimulatorChange}
 							>
 								{simulatorList.map((simulator) =>
@@ -134,7 +141,7 @@ export function Simulator() {
 						}
 
 						<div>
-							{checkRunnning() ?
+							{ !checkRunnning() ?
 								<IconButton onClick={() => setConfirmPlayOpen(true)}>
 									<PlayCircle sx={{ fontSize: "60px", color: "#f00" }} />
 
@@ -147,48 +154,9 @@ export function Simulator() {
 
 
 						</div>
-						<Dialog
-							open={confirmPlayOpen}
-							onClose={() => setConfirmPlayOpen(false)}
-							aria-labelledby="alert-dialog-title"
-							aria-describedby="alert-dialog-description"
-						>
-							<DialogTitle id="alert-dialog-title">
-								{"Start simulator?"}
-							</DialogTitle>
-							<DialogContent>
-								<DialogContentText id="alert-dialog-description">
-									Dou you want to start {simulator?.simulatorName} ?
-								</DialogContentText>
-							</DialogContent>
-							<DialogActions>
-								<Button onClick={() => setConfirmPlayOpen(false)}>Cancel</Button>
-								<Button onClick={handlePlay} autoFocus>
-									Start
-								</Button>
-							</DialogActions>
-						</Dialog>
-						<Dialog
-							open={confirmStopOpen}
-							onClose={() => setConfirmStopOpen(false)}
-							aria-labelledby="alert-dialog-title"
-							aria-describedby="alert-dialog-description"
-						>
-							<DialogTitle id="alert-dialog-title">
-								{"Stop simulator?"}
-							</DialogTitle>
-							<DialogContent>
-								<DialogContentText id="alert-dialog-description">
-									Dou you want to stop {simulator?.simulatorName} ?
-								</DialogContentText>
-							</DialogContent>
-							<DialogActions>
-								<Button onClick={() => setConfirmStopOpen(false)}>Cancel</Button>
-								<Button onClick={handleStop} autoFocus>
-									Stop
-								</Button>
-							</DialogActions>
-						</Dialog>
+						<ConfirmPlayDialog confirmPlayOpen={confirmPlayOpen} setConfirmPlayOpen={setConfirmPlayOpen} simulator={simulator!} handlePlay={handleSimulatorUpdate.bind(null, true)} />
+						<ConfirmStopDialog confirmStopOpen={confirmStopOpen} setConfirmStopOpen={setConfirmStopOpen} simulator={simulator!} handleStop={handleSimulatorUpdate.bind(null, false)} />
+
 					</div>
 					<div id="PL" className="simulator-inner">
 						<Chart
@@ -200,7 +168,7 @@ export function Simulator() {
 						/>
 					</div>
 					<AlgorithmList />
-					<Positions positionLoading={positionLoading} positions={positions} />
+					<PositionsList positionLoading={positionLoading} positions={positions} />
 					<History historyLoading={historyLoading} />
 				</div>
 			</div>

@@ -3,7 +3,7 @@ import { DataGrid } from "@mui/x-data-grid";
 
 import { PositionsColumns } from "../mockdata"
 
-export function Positions(props: { positionLoading: any; positions: readonly any[]; }){
+export function PositionsList(props: { positionLoading: any; positions: readonly any[]; }){
 
 	return (
 		<div id="p" className="simulator-inner">
