@@ -54,7 +54,14 @@ export function Simulator() {
 
 	const init = (simulatorId: number | null = null) => {
 		if (isLoading) return;
-		let url = "http://localhost:8080/simulators/" + sub;
+		/*
+			memo:
+				localのSpringBootに接続する場合は
+					url = "http://localhost:8080/" ...
+				amazon ec2のSpringBootに接続する場合はフロントエンドのプロキシを利用して
+					url = "http://44.202.140.11/amateras/"
+		*/
+		let url = "http://44.202.140.11/amateras/simulators/" + sub;
 		setSimulatorLoading(true);
 		fetch(url).then((res) => res.json()).then((res: Simulators[]) => {
 			if (res.length === 0) {
@@ -67,7 +74,7 @@ export function Simulator() {
 			setSimulatorLoading(false);
 		});
 		setPositionsLoading(true);
-		fetch('http://localhost:8080/positions/' + simulator!.id).then((res) => res.json()).then((res: Positions[]) => {
+		fetch('http://44.202.140.11/amateras/positions/' + simulator!.id).then((res) => res.json()).then((res: Positions[]) => {
 			setPositions(res);
 			setPositionsLoading(false);
 		})
@@ -98,7 +105,7 @@ export function Simulator() {
 		old_simulator.isRunning = isRunning;
 		setSimulator(new_simulator);
 		setSimulatorList(new_simulatorList);
-		fetch("http://localhost:8080/simulators/update", { method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" }, body: JSON.stringify(new_simulator) })//.then(() => init(simulator.id));
+		fetch("http://44.202.140.11/amateras/simulators/update", { method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" }, body: JSON.stringify(new_simulator) })//.then(() => init(simulator.id));
 		setConfirmPlayOpen(false);
 		setConfirmStopOpen(false);
 	}
@@ -114,7 +121,7 @@ export function Simulator() {
 			return
 		};
 		setPositionsLoading(true);
-		fetch('http://localhost:8080/positions/' + simulator!.id).then((res) => res.json()).then((res: Positions[]) => {
+		fetch('http://44.202.140.11/amateras/positions/' + simulator!.id).then((res) => res.json()).then((res: Positions[]) => {
 			setPositions(res);
 			setPositionsLoading(false);
 		})
