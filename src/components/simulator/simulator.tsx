@@ -16,6 +16,7 @@ import { ConfirmStopDialog } from "./dialogs/confirm-stop-dialog";// @ts-ignore
 import Positions from "../../intefaces/positions";// @ts-ignore
 import Simulators from "../../intefaces/simulators";// @ts-ignore
 import { EditNameDialog } from "./dialogs/edit-name-dialog";// @ts-ignore
+import { AddSimulatorDialog } from "./dialogs/add-simulator-dialog";
 
 export function Simulator() {
 	const [simulatorList, setSimulatorList] = useState([] as Simulators[]);
@@ -80,6 +81,17 @@ export function Simulator() {
 		if (simulator === undefined) return;
 		updateSimulator({id: simulator.id, isRunning: simulator.isRunning, simulatorName: name, userUuid: sub});
 		setEditNameOpen(false);
+	}	
+	const addSimulator = (name: string) => {
+		if(name === undefined || name === ""){
+			setAddSimulatorOpen(false);
+			setNameNullAlertOpen(true);
+			return 
+		}
+		if(simulator === undefined) return;
+		const PLACE_HOLDER_NUM = 0;
+		updateSimulator({id: PLACE_HOLDER_NUM, isRunning: false, simulatorName: name, userUuid: sub}, true);
+		setAddSimulatorOpen(false);
 	}
 	const nameNullAlert = (
 		<Snackbar open={nameNullAlertOpen} onClose={() => setNameNullAlertOpen(false)}>
@@ -88,12 +100,6 @@ export function Simulator() {
 			</Alert>
 		</Snackbar>
 	);
-
-	const addSimulator = (name: string) => {
-		if(simulator === undefined) return;
-		const PLACE_HOLDER_NUM = 0;
-		updateSimulator({id: PLACE_HOLDER_NUM, isRunning: true, simulatorName: name, userUuid: sub}, true);
-	}
 
 	const updateSimulator = (_new: Simulators, isAdd: boolean = false) => {
 		let new_simulatorList = simulatorList;
@@ -167,9 +173,10 @@ export function Simulator() {
 					<ConfirmPlayDialog confirmPlayOpen={confirmPlayOpen} setConfirmPlayOpen={setConfirmPlayOpen} simulator={simulator!} handlePlay={handleSimulatorUpdate.bind(null, true)} />
 					<ConfirmStopDialog confirmStopOpen={confirmStopOpen} setConfirmStopOpen={setConfirmStopOpen} simulator={simulator!} handleStop={handleSimulatorUpdate.bind(null, false)} />
 					<Button id="edit-name" variant="outlined" onClick={() => setEditNameOpen(true)}>edit name</Button>
-					<EditNameDialog originalName={simulator?.simulatorName} editNameOpen={editNameOpen} setEditNameOpen={setEditNameOpen} editSimulatorName={editSimulatorName}></EditNameDialog>
+					<EditNameDialog originalName={simulator?.simulatorName} editNameOpen={editNameOpen} setEditNameOpen={setEditNameOpen} editSimulatorName={editSimulatorName} />
+					<Button id="add-new-sim" variant="contained" onClick={() => setAddSimulatorOpen(true)}>Add new simulator</Button>
+					<AddSimulatorDialog addSimulatorOpen={addSimulatorOpen} setAddSimulatorOpen={setAddSimulatorOpen} addSimulator={addSimulator} />
 					{nameNullAlert}
-					<Button id="add-new-sim" variant="contained">Add new simulator</Button>
 				</div>
 				<div id="PL" className="simulator-inner">
 					<Chart
