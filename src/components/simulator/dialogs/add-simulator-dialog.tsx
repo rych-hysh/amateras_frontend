@@ -37,7 +37,7 @@ export function AddSimulatorDialog(props: { addSimulatorOpen: boolean; setAddSim
 			</DialogContent>
 			<DialogActions>
 				<Button onClick={() => props.setAddSimulatorOpen(false)}>Cancel</Button>
-				<Button onClick={() => props.addSimulator(simulatorName)}>Rename</Button>
+				<Button onClick={() => props.addSimulator(simulatorName)}>Add</Button>
 			</DialogActions>
 		</Dialog>
 	)
