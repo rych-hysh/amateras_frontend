@@ -21,7 +21,6 @@ import { AddSimulatorDialog } from "./dialogs/add-simulator-dialog";
 
 export function Simulator() {
 	const [simulatorList, setSimulatorList] = useState([] as Simulators[]);
-	const [algorithmList, setAlgorithmList] = useState([] as Algorithm[]);
 	const [simulator, setSimulator] = useState(mockSimulator as Simulators | undefined);
 	const [positions, setPositions] = useState([] as Positions[]);
 	const [simulatorLoading, setSimulatorLoading] = useState(true);
@@ -64,9 +63,6 @@ export function Simulator() {
 		})
 		setHistoryLoading(true);
 		fetch('http://localhost:3030/history').then((res) => res.json()).then(() => setHistoryLoading(false));
-
-		
-		fetch("http://localhost:8080/algorithms/available").then(res => res.json()).then((r: Algorithm[]) => setAlgorithmList(r))
 	}
 
 	const handleSimulatorChange = (event: SelectChangeEvent) => {
@@ -199,7 +195,7 @@ export function Simulator() {
 					<Button id="edit-name" variant="outlined" onClick={() => setEditNameOpen(true)}>edit name</Button>
 					<EditNameDialog originalName={simulator?.simulatorName} editNameOpen={editNameOpen} setEditNameOpen={setEditNameOpen} editSimulatorName={editSimulatorName} />
 					<Button id="add-new-sim" variant="contained" onClick={() => setAddSimulatorOpen(true)}>Add new simulator</Button>
-					<AddSimulatorDialog algorithmList={algorithmList} addSimulatorOpen={addSimulatorOpen} setAddSimulatorOpen={setAddSimulatorOpen} addSimulator={addSimulator} />
+					<AddSimulatorDialog addSimulatorOpen={addSimulatorOpen} setAddSimulatorOpen={setAddSimulatorOpen} addSimulator={addSimulator} />
 					{nameNullAlert}
 				</div>
 				<div id="PL" className="simulator-inner">

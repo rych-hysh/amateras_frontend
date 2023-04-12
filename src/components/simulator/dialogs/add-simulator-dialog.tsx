@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Algorithm } from "../../../intefaces/algorithm";
 
 export function AddSimulatorDialog(props: {
-	algorithmList: Algorithm[]; addSimulatorOpen: boolean; setAddSimulatorOpen: (arg0: boolean) => void; addSimulator: (name: string) => void; 
+	addSimulatorOpen: boolean; setAddSimulatorOpen: (arg0: boolean) => void; addSimulator: (name: string) => void; 
 }) {
 	const [simulatorName, setSimulatorName] = useState("" as string);
 	// const [algorithm, setAlgorithm] = useState({id: 1, name: ""} as Algorithm); // https://github.com/rych-hysh/amateras_frontend/wiki/Memos#1
@@ -42,8 +42,6 @@ export function AddSimulatorDialog(props: {
 					value={simulatorName}
 					onChange={handleChange}
 				/>
-				<Divider />
-				<Divider />
 				{/* https://github.com/rych-hysh/amateras_frontend/wiki/Memos#1
 				 <DialogContentText>
 					Choose simulate algorithms;
@@ -61,7 +59,7 @@ export function AddSimulatorDialog(props: {
 			</DialogContent>
 			<DialogActions>
 				<Button onClick={() => props.setAddSimulatorOpen(false)}>Cancel</Button>
-				<Button onClick={() => props.addSimulator(simulatorName)}>Add</Button>
+				<Button variant="contained" onClick={() => props.addSimulator(simulatorName)}>Add</Button>
 			</DialogActions>
 		</Dialog>
 	)

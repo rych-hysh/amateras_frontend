@@ -32,7 +32,7 @@ export function EditNameDialog(props: { originalName: string | undefined;editNam
         </DialogContent>
         <DialogActions>
           <Button onClick={() => props.setEditNameOpen(false)}>Cancel</Button>
-          <Button onClick={() => props.editSimulatorName(simulatorName)}>Rename</Button>
+          <Button variant="contained" onClick={() => props.editSimulatorName(simulatorName)}>Rename</Button>
         </DialogActions>
       </Dialog>
 	)

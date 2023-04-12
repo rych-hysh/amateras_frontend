@@ -19,7 +19,7 @@ export function ConfirmStopDialog(props: { confirmStopOpen: boolean; setConfirmS
 		</DialogContent>
 		<DialogActions>
 			<Button onClick={() => props.setConfirmStopOpen(false)}>Cancel</Button>
-			<Button onClick={props.handleStop} autoFocus>
+			<Button variant="contained" onClick={props.handleStop} autoFocus>
 				Stop
 			</Button>
 		</DialogActions>

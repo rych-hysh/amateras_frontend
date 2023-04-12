@@ -19,7 +19,7 @@ export function ConfirmPlayDialog(props: { confirmPlayOpen: boolean; setConfirmP
 		</DialogContent>
 		<DialogActions>
 			<Button onClick={() => props.setConfirmPlayOpen(false)}>Cancel</Button>
-			<Button onClick={props.handlePlay} autoFocus>
+			<Button variant="contained" onClick={props.handlePlay} autoFocus>
 				Start
 			</Button>
 		</DialogActions>
