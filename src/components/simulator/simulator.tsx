@@ -207,7 +207,7 @@ export function Simulator() {
 						options={{ isStacked: true }}
 					/>
 				</div>
-				<AlgorithmList />
+				<AlgorithmList simulatorId={simulator?.id}/>
 				<PositionsList positionLoading={positionLoading} positions={positions} />
 				<History historyLoading={historyLoading} />
 			</div>

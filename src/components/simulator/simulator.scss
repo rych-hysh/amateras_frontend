@@ -3,13 +3,12 @@
 	display: grid;
 	height: calc(100vh - 65px);
 	width: calc(100vw - 65px);
-	min-width: 800px;
 	grid-template-columns: 5fr 3fr 2fr;
-	grid-template-rows: 100px 60% 1fr;
+	grid-template-rows: 100px 50% 1fr;
 }
 
 .simulator-inner{
-	border-style: dashed;
+	border-style: none;
 	// align-items: center;
 }
 
@@ -86,10 +85,12 @@
 
 .positive {
 	background-color: #FF5722;
+	background-color: rgba(255, 87, 34, 0.6);
 }
 
 .negative {
 	background-color: #03A9F4;
+	background-color: rgba(3, 169, 244, 0.7);
 }
 
 #h{
