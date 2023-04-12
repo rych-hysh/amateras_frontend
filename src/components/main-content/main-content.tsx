@@ -27,7 +27,7 @@ export function MainContent() {
 					<Route path='/grid2' element={<GridTest2 />} />
 					<Route path="/signin" element={<SignIn />} />
 					<Route path="/signup" element={<SignUp />} />
-					<Route path="/cofirmsignup" element={<ConfirmSignUp />} />
+					<Route path="/confirmsignup" element={<ConfirmSignUp />} />
 					<Route path="/profile" element={<Profile />} />
 				</Routes>
 		</>
