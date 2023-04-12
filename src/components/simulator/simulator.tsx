@@ -18,6 +18,11 @@ import Simulators from "../../intefaces/simulators";// @ts-ignore
 import { EditNameDialog } from "./dialogs/edit-name-dialog";// @ts-ignore
 import { AddSimulatorDialog } from "./dialogs/add-simulator-dialog";
 
+interface AlgorithmList{
+	id: number,
+	name: string
+}
+
 export function Simulator() {
 	const [simulatorList, setSimulatorList] = useState([] as Simulators[]);
 	const [simulator, setSimulator] = useState(mockSimulator as Simulators | undefined);
@@ -43,7 +48,7 @@ export function Simulator() {
 				amazon ec2のSpringBootに接続する場合はフロントエンドのプロキシを利用して
 					url = "http://44.202.140.11/amateras/"
 		*/
-		let url = "http://44.202.140.11/amateras/simulators/" + sub;
+		let url = "http://localhost:8080/simulators/" + sub;
 		setSimulatorLoading(true);
 		fetch(url).then((res) => res.json()).then((res: Simulators[]) => {
 			if (res.length === 0) {
@@ -62,6 +67,9 @@ export function Simulator() {
 		})
 		setHistoryLoading(true);
 		fetch('http://localhost:3030/history').then((res) => res.json()).then(() => setHistoryLoading(false));
+
+		
+		fetch("http://localhost:8080/algorithms/available").then(res => res.json()).then((r: AlgorithmList[]) => console.log(r))
 	}
 
 	const handleSimulatorChange = (event: SelectChangeEvent) => {
@@ -85,7 +93,7 @@ export function Simulator() {
 		old_simulator.isRunning = isRunning;
 		setSimulator(new_simulator);
 		setSimulatorList(new_simulatorList);
-		fetch("http://44.202.140.11/amateras/simulators/update", { method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" }, body: JSON.stringify(new_simulator) })//.then(() => init(simulator.id));
+		fetch("http://localhost:8080/simulators/update", { method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" }, body: JSON.stringify(new_simulator) })//.then(() => init(simulator.id));
 		setConfirmPlayOpen(false);
 		setConfirmStopOpen(false);
 	}
