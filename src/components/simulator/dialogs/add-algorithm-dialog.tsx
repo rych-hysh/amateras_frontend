@@ -3,13 +3,15 @@ import { useState } from "react";
 import { Algorithm } from "../../../intefaces/algorithm";
 
 export function AddAlgorithmDialog(props: {
-	algorithmList: Algorithm[]; addAlgorithmOpen: boolean; setAddAlgorithmOpen: (arg0: boolean) => void; addAlgorithm: (id: number) => void;
+	addAlgorithmOpen: boolean; setAddAlgorithmOpen: (arg0: boolean) => void; addAlgorithm: (id: number) => void;
 }) {
+	var algorithmList: Algorithm[] = [];
 	const [algorithmId, setAlgorithmId] = useState(1);
 	const [algorithm, setAlgorithm] = useState({} as Algorithm)
 	const handleAlgorithmChange = (event: any) => {
 		setAlgorithmId(event.target.value);
 	}
+	fetch("http://localhost:8080/algorithms/available").then(res => res.json()).then(list => algorithmList = list);
 	return (
 		<Dialog open={props.addAlgorithmOpen}>
 			<DialogTitle>Add new algorithm.</DialogTitle>
@@ -25,7 +27,7 @@ export function AddAlgorithmDialog(props: {
 					fullWidth
 					onChange={handleAlgorithmChange}
 				>
-					{props.algorithmList.map((algorithm) =>
+					{algorithmList?.map((algorithm) =>
 						<MenuItem key={algorithm.id} value={algorithm.id}>{algorithm.name} </MenuItem>
 					)}
 				</Select>

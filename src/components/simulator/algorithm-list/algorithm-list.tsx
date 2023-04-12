@@ -6,12 +6,11 @@ import { AddAlgorithmDialog } from "../dialogs/add-algorithm-dialog";
 import { useAuth } from "../../../auth/use-auth";
 import { PropaneSharp } from "@mui/icons-material";
 export function AlgorithmList(props: {simulatorId: number | undefined}) {
-	const [algorithm, setAlgorithm] = useState({ id: 0, name: "" } as Algorithm)
-	const [algorithmList, setAlgorithmList] = useState([] as Algorithm[]);
+	const [subscribeAlgorithmList, setSubscribeAlgorithmList] = useState([] as Algorithm[]);
 	const [addAlgorithmOpen, setAddAlgorithmOpen] = useState(false);
 	const { sub, isLoading } = useAuth();
 	const init = () => {
-		fetch("http://localhost:8080/algorithms/available").then(res => res.json()).then((r: Algorithm[]) => setAlgorithmList(r))
+		fetch("http://localhost:8080/algorithms/available").then(res => res.json()).then((r: Algorithm[]) => setSubscribeAlgorithmList(r))
 	}
 	const addAlgorithm = (algorithmId: number) => {
 		setAddAlgorithmOpen(false)
@@ -41,13 +40,13 @@ export function AlgorithmList(props: {simulatorId: number | undefined}) {
 					</ListSubheader>
 				}
 			>
-				{algorithmList.map((alg) =>
+				{subscribeAlgorithmList.map((alg) =>
 					<ListItem key={alg.id} value={alg.id}>{alg.name} </ListItem>
 				)}
 			</List>
 
 			<Button id="add-algorithm" variant="contained" onClick={() => setAddAlgorithmOpen(true)}>Add algorithm</Button>
-			<AddAlgorithmDialog algorithmList={algorithmList} addAlgorithmOpen={addAlgorithmOpen} setAddAlgorithmOpen={setAddAlgorithmOpen} addAlgorithm={addAlgorithm}/>
+			<AddAlgorithmDialog addAlgorithmOpen={addAlgorithmOpen} setAddAlgorithmOpen={setAddAlgorithmOpen} addAlgorithm={addAlgorithm}/>
 		</Box>
 	)
 
