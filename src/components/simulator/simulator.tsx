@@ -15,6 +15,7 @@ import { ConfirmPlayDialog } from "./dialogs/confirm-play-dialog";// @ts-ignore
 import { ConfirmStopDialog } from "./dialogs/confirm-stop-dialog";// @ts-ignore
 import Positions from "../../intefaces/positions";// @ts-ignore
 import Simulators from "../../intefaces/simulators";// @ts-ignore
+import Algorithm from "../../intefaces/algorithm";// @ts-ignore
 import { EditNameDialog } from "./dialogs/edit-name-dialog";// @ts-ignore
 import { AddSimulatorDialog } from "./dialogs/add-simulator-dialog";
 
@@ -43,7 +44,7 @@ export function Simulator() {
 				amazon ec2のSpringBootに接続する場合はフロントエンドのプロキシを利用して
 					url = "http://44.202.140.11/amateras/"
 		*/
-		let url = "http://44.202.140.11/amateras/simulators/" + sub;
+		let url = "http://localhost:8080/simulators/" + sub;
 		setSimulatorLoading(true);
 		fetch(url).then((res) => res.json()).then((res: Simulators[]) => {
 			if (res.length === 0) {
@@ -85,7 +86,7 @@ export function Simulator() {
 		old_simulator.isRunning = isRunning;
 		setSimulator(new_simulator);
 		setSimulatorList(new_simulatorList);
-		fetch("http://44.202.140.11/amateras/simulators/update", { method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" }, body: JSON.stringify(new_simulator) })//.then(() => init(simulator.id));
+		fetch("http://localhost:8080/simulators/update", { method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" }, body: JSON.stringify(new_simulator) })//.then(() => init(simulator.id));
 		setConfirmPlayOpen(false);
 		setConfirmStopOpen(false);
 	}
@@ -109,6 +110,7 @@ export function Simulator() {
 		if(simulator === undefined) return;
 		const PLACE_HOLDER_NUM = 0;
 		updateSimulator({id: PLACE_HOLDER_NUM, isRunning: false, simulatorName: name, userUuid: sub}, true);
+		//addAlgorithmToSimulator()
 		setAddSimulatorOpen(false);
 	}
 	const nameNullAlert = (
@@ -205,7 +207,7 @@ export function Simulator() {
 						options={{ isStacked: true }}
 					/>
 				</div>
-				<AlgorithmList />
+				<AlgorithmList simulatorId={simulator?.id}/>
 				<PositionsList positionLoading={positionLoading} positions={positions} />
 				<History historyLoading={historyLoading} />
 			</div>
