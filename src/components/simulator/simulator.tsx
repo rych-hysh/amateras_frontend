@@ -15,16 +15,13 @@ import { ConfirmPlayDialog } from "./dialogs/confirm-play-dialog";// @ts-ignore
 import { ConfirmStopDialog } from "./dialogs/confirm-stop-dialog";// @ts-ignore
 import Positions from "../../intefaces/positions";// @ts-ignore
 import Simulators from "../../intefaces/simulators";// @ts-ignore
+import Algorithm from "../../intefaces/algorithm";// @ts-ignore
 import { EditNameDialog } from "./dialogs/edit-name-dialog";// @ts-ignore
 import { AddSimulatorDialog } from "./dialogs/add-simulator-dialog";
 
-interface AlgorithmList{
-	id: number,
-	name: string
-}
-
 export function Simulator() {
 	const [simulatorList, setSimulatorList] = useState([] as Simulators[]);
+	const [algorithmList, setAlgorithmList] = useState([] as Algorithm[]);
 	const [simulator, setSimulator] = useState(mockSimulator as Simulators | undefined);
 	const [positions, setPositions] = useState([] as Positions[]);
 	const [simulatorLoading, setSimulatorLoading] = useState(true);
@@ -69,7 +66,7 @@ export function Simulator() {
 		fetch('http://localhost:3030/history').then((res) => res.json()).then(() => setHistoryLoading(false));
 
 		
-		fetch("http://localhost:8080/algorithms/available").then(res => res.json()).then((r: AlgorithmList[]) => console.log(r))
+		fetch("http://localhost:8080/algorithms/available").then(res => res.json()).then((r: Algorithm[]) => setAlgorithmList(r))
 	}
 
 	const handleSimulatorChange = (event: SelectChangeEvent) => {
@@ -117,6 +114,7 @@ export function Simulator() {
 		if(simulator === undefined) return;
 		const PLACE_HOLDER_NUM = 0;
 		updateSimulator({id: PLACE_HOLDER_NUM, isRunning: false, simulatorName: name, userUuid: sub}, true);
+		//addAlgorithmToSimulator()
 		setAddSimulatorOpen(false);
 	}
 	const nameNullAlert = (
@@ -201,7 +199,7 @@ export function Simulator() {
 					<Button id="edit-name" variant="outlined" onClick={() => setEditNameOpen(true)}>edit name</Button>
 					<EditNameDialog originalName={simulator?.simulatorName} editNameOpen={editNameOpen} setEditNameOpen={setEditNameOpen} editSimulatorName={editSimulatorName} />
 					<Button id="add-new-sim" variant="contained" onClick={() => setAddSimulatorOpen(true)}>Add new simulator</Button>
-					<AddSimulatorDialog addSimulatorOpen={addSimulatorOpen} setAddSimulatorOpen={setAddSimulatorOpen} addSimulator={addSimulator} />
+					<AddSimulatorDialog algorithmList={algorithmList} addSimulatorOpen={addSimulatorOpen} setAddSimulatorOpen={setAddSimulatorOpen} addSimulator={addSimulator} />
 					{nameNullAlert}
 				</div>
 				<div id="PL" className="simulator-inner">
