@@ -67,6 +67,7 @@ export function Simulator() {
 
 	const handleSimulatorChange = (event: SelectChangeEvent) => {
 		setSimulator(simulatorList.find(simulator => simulator.id === parseInt(event.target.value)));
+		
 	}
 
 	const checkRunnning = () => {
