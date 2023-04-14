@@ -1,17 +1,22 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, MenuItem, Select, TextField } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Algorithm } from "../../../intefaces/algorithm";
 
 export function AddAlgorithmDialog(props: {
 	addAlgorithmOpen: boolean; setAddAlgorithmOpen: (arg0: boolean) => void; addAlgorithm: (id: number) => void;
 }) {
-	var algorithmList: Algorithm[] = [];
 	const [algorithmId, setAlgorithmId] = useState(1);
-	const [algorithm, setAlgorithm] = useState({} as Algorithm)
+	const [availableAlgorithmList, setAvailableAlgorithmList] = useState([] as Algorithm[])
 	const handleAlgorithmChange = (event: any) => {
 		setAlgorithmId(event.target.value);
 	}
-	fetch("http://localhost:8080/algorithms/available").then(res => res.json()).then(list => algorithmList = list);
+	const init = () => {
+		fetch("http://localhost:8080/algorithms/available").then(res => res.json()).then(list => {
+		setAvailableAlgorithmList(list);
+	})}
+	useEffect(() => {
+		init()
+	}, [])
 	return (
 		<Dialog open={props.addAlgorithmOpen}>
 			<DialogTitle>Add new algorithm.</DialogTitle>
@@ -27,8 +32,8 @@ export function AddAlgorithmDialog(props: {
 					fullWidth
 					onChange={handleAlgorithmChange}
 				>
-					{algorithmList?.map((algorithm) =>
-						<MenuItem key={algorithm.id} value={algorithm.id}>{algorithm.name} </MenuItem>
+					{availableAlgorithmList.map((alg) =>
+						<MenuItem key={alg.id} value={alg.id}>{alg.name} </MenuItem>
 					)}
 				</Select>
 			</DialogContent>
