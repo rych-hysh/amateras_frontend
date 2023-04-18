@@ -17,11 +17,13 @@ import Positions from "../../intefaces/positions";// @ts-ignore
 import Simulators from "../../intefaces/simulators";// @ts-ignore
 import { EditNameDialog } from "./dialogs/edit-name-dialog";// @ts-ignore
 import { AddSimulatorDialog } from "./dialogs/add-simulator-dialog";
+import Histories from "../../intefaces/histories";
 
 export function Simulator() {
 	const [simulatorList, setSimulatorList] = useState([] as Simulators[]);
 	const [simulator, setSimulator] = useState({} as Simulators | undefined);
 	const [positions, setPositions] = useState([] as Positions[]);
+	const [histories, setHistories] = useState([] as Histories[]);
 	const [simulatorLoading, setSimulatorLoading] = useState(true);
 	const [positionLoading, setPositionsLoading] = useState(true);
 	const [historyLoading, setHistoryLoading] = useState(true);
@@ -56,12 +58,15 @@ export function Simulator() {
 			setSimulatorLoading(false);
 		});
 		setPositionsLoading(true);
-		fetch('http://localhost:8080/positions/' + simulator!.id).then((res) => res.json()).then((res: Positions[]) => {
+		fetch('http://localhost:8080/positions/' + simulator!.id + "/unsettled").then((res) => res.json()).then((res: Positions[]) => {
 			setPositions(res);
 			setPositionsLoading(false);
 		})
 		setHistoryLoading(true);
-		fetch('http://localhost:3030/history').then((res) => res.json()).then(() => setHistoryLoading(false));
+		fetch('http://localhost:8080/positions/' + simulator!.id + "/settled").then((res) => res.json()).then((res: Histories[]) => {
+			setHistories(res);
+			setHistoryLoading(false);
+		})
 	}
 
 	const handleSimulatorChange = (event: SelectChangeEvent) => {
@@ -154,9 +159,14 @@ export function Simulator() {
 			return
 		};
 		setPositionsLoading(true);
-		fetch('http://localhost:8080/positions/' + simulator!.id).then((res) => res.json()).then((res: Positions[]) => {
+		fetch('http://localhost:8080/positions/' + simulator!.id + "/unsettled").then((res) => res.json()).then((res: Positions[]) => {
 			setPositions(res);
 			setPositionsLoading(false);
+		})
+		setHistoryLoading(true);
+		fetch('http://localhost:8080/positions/' + simulator!.id + "/settled").then((res) => res.json()).then((res: Histories[]) => {
+			setHistories(res);
+			setHistoryLoading(false);
 		})
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [simulator])
@@ -211,7 +221,7 @@ export function Simulator() {
 				</div>
 				<AlgorithmList simulatorId={simulator?.id}/>
 				<PositionsList positionLoading={positionLoading} positions={positions} />
-				<History historyLoading={historyLoading} />
+				<History historyLoading={historyLoading} histories={histories}/>
 			</div>
 		</PrivatePage>
 	)
