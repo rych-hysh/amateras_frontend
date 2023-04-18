@@ -46,7 +46,7 @@ export const historyRows = [
 ]
 
 export const mockSimulator = {
-	id: -1,
+	id: undefined,
 	simulatorName: '',
 	isRunning: false,
 	userUuid: ''

@@ -7,7 +7,7 @@ import { useAuth } from "../../auth/use-auth";
 
 
 import "./simulator.scss"
-import { data, mockSimulator } from "./mockdata";// @ts-ignore
+import { data } from "./mockdata";// @ts-ignore
 import { PositionsList } from "./positions/positions-list";// @ts-ignore
 import { History } from "./history/history";// @ts-ignore
 import { AlgorithmList } from "./algorithm-list/algorithm-list";// @ts-ignore
@@ -15,14 +15,13 @@ import { ConfirmPlayDialog } from "./dialogs/confirm-play-dialog";// @ts-ignore
 import { ConfirmStopDialog } from "./dialogs/confirm-stop-dialog";// @ts-ignore
 import Positions from "../../intefaces/positions";// @ts-ignore
 import Simulators from "../../intefaces/simulators";// @ts-ignore
-import Algorithm from "../../intefaces/algorithm";// @ts-ignore
 import { EditNameDialog } from "./dialogs/edit-name-dialog";// @ts-ignore
 import { AddSimulatorDialog } from "./dialogs/add-simulator-dialog";
 import Histories from "../../intefaces/histories";
 
 export function Simulator() {
 	const [simulatorList, setSimulatorList] = useState([] as Simulators[]);
-	const [simulator, setSimulator] = useState(mockSimulator as Simulators | undefined);
+	const [simulator, setSimulator] = useState({} as Simulators | undefined);
 	const [positions, setPositions] = useState([] as Positions[]);
 	const [histories, setHistories] = useState([] as Histories[]);
 	const [simulatorLoading, setSimulatorLoading] = useState(true);
@@ -72,6 +71,7 @@ export function Simulator() {
 
 	const handleSimulatorChange = (event: SelectChangeEvent) => {
 		setSimulator(simulatorList.find(simulator => simulator.id === parseInt(event.target.value)));
+		
 	}
 
 	const checkRunnning = () => {
@@ -136,7 +136,9 @@ export function Simulator() {
 			if( old_simulatorIndex === undefined ) return; //TODO: error handling
 			new_simulatorList.splice(old_simulatorIndex, 1, _new);
 		}
-		fetch("http://localhost:8080/simulators/update", { method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" }, body: JSON.stringify(_new) }).then(() => {
+		setSimulatorLoading(true);
+		fetch("http://localhost:8080/simulators/update", { method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" }, body: JSON.stringify(_new) }).then((res) => {
+			setSimulatorLoading(false);
 			setSimulator(_new);
 			setSimulatorList(new_simulatorList);
 		}).then(() =>{
