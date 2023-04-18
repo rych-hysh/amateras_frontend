@@ -1,33 +1,10 @@
 import { autocompleteClasses, Box, Paper, Stack } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Chart } from "react-google-charts";
 
 import "./charts.scss";
 
-export const data = [
-	["day", "low", "open", "close", "high", "ave", "sigmah", "sigmal"],
-	[0, 125.58, 125.68, 125.61, 125.68, null, null, null],
-	[1, 125.56, 125.62, 125.58, 125.6, null, null, null],
-	[2, 125.48, 125.59, 125.49, 125.58, null, null, null],
-	[3, 124.9, 125.48, 124.9, 125.58, null, null, null],
-	[4, 124.93, 124.96, 125.2, 125.28, null, null, null],
-	[5, 125.13, 125.28, 125.13, 125.24, null, null, null],
-	[6, 125.15, 125.17, 125.24, 125.25, null, null, null],
-	[7, 125.08, 125.24, 125.25, 125.27, null, null, null],
-	[8, 125.17, 125.24, 125.2, 125.28, null, null, null],
-	[9, 125.25, 125.24, 125.28, 125.32, null, null, null],
-	[10, 125.28, 125.28, 125.32, 125.34, null, null, null],
-	[11, 125.33, 125.34, 125.4, 125.4, null, null, null],
-	[12, 125.37, 125.38, 125.4, 125.4, null, null, null],
-	[13, 125.37, 125.39, 125.38, 125.4, null, null, null],
-	[14, 125.42, 125.4, 125.43, 125.49, null, null, null],
-	[15, 125.44, 125.42, 125.59, 125.61, null, null, null],
-	[16, 125.55, 125.59, 125.58, 125.61, null, null, null],
-	[17, 125.54, 125.59, 125.58, 125.64, null, null, null],
-	[18, 125.5, 125.58, 125.5, 125.55, null, null, null],
-	[19, 125.53, 125.52, 125.6, 125.61, 125.383, 125.7579186578446, 125.00808134215539],
-	[20, 125.59, 125.61, 125.62, 125.69, 125.38349999999998, 125.75965289444585, 125.00734710555412]
-];
+const dataHeader = ["date", "low", "open", "close", "high", "ave", "sigmah", "sigmal"];
 
 const RSIforEx = [
 	["x", "y1", "y2"],
@@ -53,7 +30,7 @@ export const options = {
 	},
 	colors: ['black'],
 	seriesType: "candlesticks",
-	series: { 1: { type: "line", color: 'orange' }, 2: { type: "line", color: "skyblue" }, 3: { type: "line", color: 'skyblue' }, 4: { type: "line", color: "green" } }
+	series: { 1: { type: "line", color: 'orange', curveType: "function" }, 2: { type: "line", color: "skyblue", curveType: "function"  }, 3: { type: "line", color: 'skyblue', curveType: "function"  }, 4: { type: "line", color: "green" } }
 };
 
 const RSIopForEx = {
@@ -67,7 +44,42 @@ const RSIopForEx = {
 }
 
 export function Charts() {
-	var rate = 100.3;
+	// TODO: add interface
+	const [rates, setRates] = useState([] as any[]);
+	const [dataLoading, setDataLoading] = useState(true);
+	const [chartData, setChartData] = useState([] as any[]);
+	var data: any[] = [];
+	const init = () => {
+		fetch("http://localhost:8080/rates/candle?numOfBar=8&dataInBar=4&nForSigma=2").then(res => res.json()).then(res => {
+			setRates(res);
+		})
+	}
+
+	useEffect(() => {
+		setDataLoading(true);
+		data = [];
+		data.push(dataHeader);
+		rates.forEach((rate: any) => {
+			var datum: any[] = [];
+			datum.push(rate["date"]);
+			datum.push(rate["low"]);
+			datum.push(rate["open"]);
+			datum.push(rate["close"]);
+			datum.push(rate["high"]);
+			datum.push(rate["ave"]);
+			datum.push(rate["sigma_high"]);
+			datum.push(rate["sigma_low"]);
+			data.push(datum);
+		})
+		setChartData(data);
+		setDataLoading(false)
+	}, [rates])
+
+	useEffect(() => {
+		init()
+	}, []);
+
+	var rate = 100.4;
 	// TODO: 一つ目のChartはLineChartのIntervalsを利用するように変更したい
 	return (
 		<div id="chartOuter">
@@ -87,7 +99,7 @@ export function Charts() {
 			<div id="chartMain">
 				<Chart
 					chartType="ComboChart"
-					data={data}
+					data={chartData}
 					options={options}
 					legendToggle
 					width={"100%"}
