@@ -11,7 +11,7 @@ export function AlgorithmList(props: { simulatorId: number | undefined }) {
 	const [addAlgorithmOpen, setAddAlgorithmOpen] = useState(false);
 	const { sub, isLoading } = useAuth();
 	const init = () => {
-		if (props.simulatorId === undefined) {
+		if (props.simulatorId! === undefined) {
 			return;
 		} else {
 			fetch("http://localhost:8080/algorithms/" + props.simulatorId).then(res => res.json()).then((r: Algorithm[]) => {

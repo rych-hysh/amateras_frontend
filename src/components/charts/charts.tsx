@@ -50,7 +50,7 @@ export function Charts() {
 	const [chartData, setChartData] = useState([] as any[]);
 	var data: any[] = [];
 	const init = () => {
-		fetch("http://localhost:8080/rates/candle?numOfBar=8&dataInBar=4&nForSigma=2").then(res => res.json()).then(res => {
+		fetch("http://localhost:8080/rates/candle?numOfBar=36&dataInBar=6&nForSigma=20").then(res => res.json()).then(res => {
 			setRates(res);
 		})
 	}

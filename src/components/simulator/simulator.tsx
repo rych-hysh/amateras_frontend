@@ -7,7 +7,6 @@ import { useAuth } from "../../auth/use-auth";
 
 
 import "./simulator.scss"
-import { data } from "./mockdata";// @ts-ignore
 import { PositionsList } from "./positions/positions-list";// @ts-ignore
 import { History } from "./history/history";// @ts-ignore
 import { AlgorithmList } from "./algorithm-list/algorithm-list";// @ts-ignore
@@ -19,6 +18,8 @@ import { EditNameDialog } from "./dialogs/edit-name-dialog";// @ts-ignore
 import { AddSimulatorDialog } from "./dialogs/add-simulator-dialog";
 import Histories from "../../intefaces/histories";
 
+const fundHeader = ["date", "funds"];
+
 export function Simulator() {
 	const [simulatorList, setSimulatorList] = useState([] as Simulators[]);
 	const [simulator, setSimulator] = useState({} as Simulators | undefined);
@@ -28,6 +29,10 @@ export function Simulator() {
 	const [positionLoading, setPositionsLoading] = useState(true);
 	const [historyLoading, setHistoryLoading] = useState(true);
 
+	const [funds, setFunds] = useState([] as any[]);
+	const [fundsHistory, setFundsHistory] = useState([] as any[]);
+	const [fundsHistoryLoading, setFundsHistoryLoading] = useState(true);
+
 	const [confirmPlayOpen, setConfirmPlayOpen] = useState(false);
 	const [confirmStopOpen, setConfirmStopOpen] = useState(false);
 	const [editNameOpen, setEditNameOpen] = useState(false);
@@ -36,6 +41,7 @@ export function Simulator() {
 	const [nameChangedAlertOpen, setNameChangedAlertOpen] = useState(false);
 	const { sub, isLoading } = useAuth();
 
+	var data: any[] = [];
 	const init = (simulatorId: number | null = null, getLast: boolean = false) => {
 		if (isLoading) return;
 		/*
@@ -57,6 +63,7 @@ export function Simulator() {
 			setSimulator(simulatorList.find(simulator => simulator.id === simulatorId));
 			setSimulatorLoading(false);
 		});
+		if(simulator!.id == undefined)return;
 		setPositionsLoading(true);
 		fetch('http://localhost:8080/positions/' + simulator!.id + "/unsettled").then((res) => res.json()).then((res: Positions[]) => {
 			setPositions(res);
@@ -66,6 +73,11 @@ export function Simulator() {
 		fetch('http://localhost:8080/positions/' + simulator!.id + "/settled").then((res) => res.json()).then((res: Histories[]) => {
 			setHistories(res);
 			setHistoryLoading(false);
+		})
+		setFundsHistoryLoading(true);
+		fetch("http://localhost:8080/funds/" + simulator!.id).then(res => res.json()).then(res => {
+			setFunds(res);
+			setFundsHistoryLoading(false);
 		})
 	}
 
@@ -154,10 +166,12 @@ export function Simulator() {
 	}, [isLoading]);
 
 	useEffect(() => {
+		console.log(fundsHistory)
 		if (simulator === undefined) {
 			setSimulator(simulatorList[0])
 			return
 		};
+		if(simulator!.id == undefined)return;
 		setPositionsLoading(true);
 		fetch('http://localhost:8080/positions/' + simulator!.id + "/unsettled").then((res) => res.json()).then((res: Positions[]) => {
 			setPositions(res);
@@ -168,10 +182,28 @@ export function Simulator() {
 			setHistories(res);
 			setHistoryLoading(false);
 		})
+		setFundsHistoryLoading(true);
+		fetch("http://localhost:8080/funds/" + simulator!.id).then(res => res.json()).then(res => {
+			setFunds(res);
+			setFundsHistoryLoading(false);
+		})
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [simulator])
 
-
+	useEffect(() => {
+		setFundsHistoryLoading(true);
+		data = [];
+		data.push(fundHeader);
+		funds.forEach((fund: any) => {
+			var datum: any[] = [];
+			datum.push(fund["date"])
+			datum.push(fund["funds"])
+			data.push(datum);
+		})
+		setFundsHistory(data);
+		setFundsHistoryLoading(false);
+		console.log(fundsHistory)
+	}, [funds])
 	return (
 		<PrivatePage>
 			<div id="simulator-outer">
@@ -212,10 +244,10 @@ export function Simulator() {
 				</div>
 				<div id="PL" className="simulator-inner">
 					<Chart
-						chartType="SteppedAreaChart"
+						chartType="Line"
 						width="100%"
 						height="100%"
-						data={data}
+						data={fundsHistory}
 						options={{ isStacked: true }}
 					/>
 				</div>
