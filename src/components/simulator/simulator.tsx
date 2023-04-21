@@ -1,5 +1,5 @@
 import { Alert, Button, CircularProgress, IconButton, MenuItem, Select, SelectChangeEvent, Snackbar } from "@mui/material";
-import { PlayCircle, StopCircle } from "@mui/icons-material";
+import { Google, PlayCircle, StopCircle } from "@mui/icons-material";
 import { Chart } from "react-google-charts";
 import { useEffect, useState } from "react";
 import PrivatePage from "../private-page";
@@ -244,11 +244,11 @@ export function Simulator() {
 				</div>
 				<div id="PL" className="simulator-inner">
 					<Chart
-						chartType="Line"
+						chartType="LineChart"
 						width="100%"
 						height="100%"
 						data={fundsHistory}
-						options={{ isStacked: true }}
+						options={{ isStacked: true, vAxis:{format: '###,###'}}}
 					/>
 				</div>
 				<AlgorithmList simulatorId={simulator?.id}/>
