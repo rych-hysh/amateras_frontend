@@ -19,6 +19,10 @@ import { EditNameDialog } from "./dialogs/edit-name-dialog";// @ts-ignore
 import { AddSimulatorDialog } from "./dialogs/add-simulator-dialog";
 import Histories from "../../intefaces/histories";
 
+import {request} from "../../services/fetchService";
+
+const fundHeader = ["date", "funds"];
+
 export function Simulator() {
 	const [simulatorList, setSimulatorList] = useState([] as Simulators[]);
 	const [simulator, setSimulator] = useState({} as Simulators | undefined);
@@ -34,7 +38,7 @@ export function Simulator() {
 	const [addSimulatorOpen, setAddSimulatorOpen] = useState(false);
 	const [nameNullAlertOpen, setNameNullAlertOpen] = useState(false);
 	const [nameChangedAlertOpen, setNameChangedAlertOpen] = useState(false);
-	const { sub, isLoading } = useAuth();
+	const { sub, isLoading, getJwtToken } = useAuth();
 
 	const init = (simulatorId: number | null = null, getLast: boolean = false) => {
 		if (isLoading) return;
@@ -47,7 +51,8 @@ export function Simulator() {
 		*/
 		let url = "http://localhost:8080/simulators/" + sub;
 		setSimulatorLoading(true);
-		fetch(url).then((res) => res.json()).then((res: Simulators[]) => {
+		getJwtToken().then(token => {
+			request("/simulators/" + sub, token).then((res: Simulators[]) => {
 			if (res.length === 0) {
 				console.log('invaild uuid');
 				return;
@@ -57,6 +62,9 @@ export function Simulator() {
 			setSimulator(simulatorList.find(simulator => simulator.id === simulatorId));
 			setSimulatorLoading(false);
 		});
+		});
+
+		if(simulator!.id == undefined)return;
 		setPositionsLoading(true);
 		fetch('http://localhost:8080/positions/' + simulator!.id + "/unsettled").then((res) => res.json()).then((res: Positions[]) => {
 			setPositions(res);
