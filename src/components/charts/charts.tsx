@@ -1,6 +1,7 @@
 import { autocompleteClasses, Box, Paper, Stack } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { Chart } from "react-google-charts";
+import useAuthenticatedFetch from "../../services/fetchService";
 
 import "./charts.scss";
 
@@ -48,9 +49,10 @@ export function Charts() {
 	const [rates, setRates] = useState([] as any[]);
 	const [dataLoading, setDataLoading] = useState(true);
 	const [chartData, setChartData] = useState([] as any[]);
+	const {authedFetch} = useAuthenticatedFetch();
 	var data: any[] = [];
 	const init = () => {
-		fetch("http://localhost:8080/rates/candle?numOfBar=8&dataInBar=4&nForSigma=2").then(res => res.json()).then(res => {
+		authedFetch("/rates/candle?numOfBar=8&dataInBar=4&nForSigma=2").then(res => {
 			setRates(res);
 		})
 	}

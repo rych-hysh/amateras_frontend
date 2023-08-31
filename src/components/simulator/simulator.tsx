@@ -19,6 +19,10 @@ import { EditNameDialog } from "./dialogs/edit-name-dialog";// @ts-ignore
 import { AddSimulatorDialog } from "./dialogs/add-simulator-dialog";
 import Histories from "../../intefaces/histories";
 
+import useAuthenticatedFetch, {Request} from "../../services/fetchService";
+
+const fundHeader = ["date", "funds"];
+
 export function Simulator() {
 	const [simulatorList, setSimulatorList] = useState([] as Simulators[]);
 	const [simulator, setSimulator] = useState({} as Simulators | undefined);
@@ -35,6 +39,7 @@ export function Simulator() {
 	const [nameNullAlertOpen, setNameNullAlertOpen] = useState(false);
 	const [nameChangedAlertOpen, setNameChangedAlertOpen] = useState(false);
 	const { sub, isLoading } = useAuth();
+	const { authedFetch } = useAuthenticatedFetch();
 
 	const init = (simulatorId: number | null = null, getLast: boolean = false) => {
 		if (isLoading) return;
@@ -45,9 +50,8 @@ export function Simulator() {
 				amazon ec2のSpringBootに接続する場合はフロントエンドのプロキシを利用して
 					url = "http://44.202.140.11/amateras/"
 		*/
-		let url = "http://localhost:8080/simulators/" + sub;
 		setSimulatorLoading(true);
-		fetch(url).then((res) => res.json()).then((res: Simulators[]) => {
+		authedFetch("/simulators/" + sub).then((res: Simulators[]) => {
 			if (res.length === 0) {
 				console.log('invaild uuid');
 				return;
@@ -57,13 +61,15 @@ export function Simulator() {
 			setSimulator(simulatorList.find(simulator => simulator.id === simulatorId));
 			setSimulatorLoading(false);
 		});
+
+		if(simulator!.id == undefined)return;
 		setPositionsLoading(true);
-		fetch('http://localhost:8080/positions/' + simulator!.id + "/unsettled").then((res) => res.json()).then((res: Positions[]) => {
+		authedFetch('/positions/' + simulator!.id + "/unsettled").then((res: Positions[]) => {
 			setPositions(res);
 			setPositionsLoading(false);
 		})
 		setHistoryLoading(true);
-		fetch('http://localhost:8080/positions/' + simulator!.id + "/settled").then((res) => res.json()).then((res: Histories[]) => {
+		authedFetch('/positions/' + simulator!.id + "/settled").then((res: Histories[]) => {
 			setHistories(res);
 			setHistoryLoading(false);
 		})
@@ -91,7 +97,7 @@ export function Simulator() {
 		old_simulator.isRunning = isRunning;
 		setSimulator(new_simulator);
 		setSimulatorList(new_simulatorList);
-		fetch("http://localhost:8080/simulators/update", { method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" }, body: JSON.stringify(new_simulator) })//.then(() => init(simulator.id));
+		authedFetch("/simulators/update", { method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" }, body: JSON.stringify(new_simulator) })//.then(() => init(simulator.id));
 		setConfirmPlayOpen(false);
 		setConfirmStopOpen(false);
 	}
@@ -137,7 +143,7 @@ export function Simulator() {
 			new_simulatorList.splice(old_simulatorIndex, 1, _new);
 		}
 		setSimulatorLoading(true);
-		fetch("http://localhost:8080/simulators/update", { method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" }, body: JSON.stringify(_new) }).then((res) => {
+		authedFetch("/simulators/update", { method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" }, body: JSON.stringify(_new) }).then((res) => {
 			setSimulatorLoading(false);
 			setSimulator(_new);
 			setSimulatorList(new_simulatorList);
@@ -159,12 +165,12 @@ export function Simulator() {
 			return
 		};
 		setPositionsLoading(true);
-		fetch('http://localhost:8080/positions/' + simulator!.id + "/unsettled").then((res) => res.json()).then((res: Positions[]) => {
+		authedFetch('/positions/' + simulator!.id + "/unsettled").then((res: Positions[]) => {
 			setPositions(res);
 			setPositionsLoading(false);
 		})
 		setHistoryLoading(true);
-		fetch('http://localhost:8080/positions/' + simulator!.id + "/settled").then((res) => res.json()).then((res: Histories[]) => {
+		authedFetch('/positions/' + simulator!.id + "/settled").then((res: Histories[]) => {
 			setHistories(res);
 			setHistoryLoading(false);
 		})
