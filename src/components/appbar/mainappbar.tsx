@@ -26,6 +26,7 @@ import { IoMdNotifications } from "react-icons/io";
 import { MainContent } from '../main-content/main-content';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/use-auth';
+import useAuthenticatedFetch from "../../services/fetchService";
 import { AccountCircle } from '@mui/icons-material';
 
 import './mainappbar.scss';
@@ -103,6 +104,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 export function MainAppBar() {
   const { isAuthenticated, signOut } = useAuth();
+  const { authedFetch } = useAuthenticatedFetch();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const navigate = useNavigate();
@@ -119,7 +121,7 @@ export function MainAppBar() {
   };
 
   const handleDrawerOpen = () => {
-    fetch("http://localhost:3030/users").then((response) => response.json()).then((res) => alert(res[0].username));
+    authedFetch("http://localhost:3030/users").then((res : any[]) => alert(res[0].username));
     setOpen(true);
   };
 
@@ -130,14 +132,14 @@ export function MainAppBar() {
 
   const handleDrawerClose = () => {
 
-    fetch("http://localhost:3030/users", {
+    authedFetch("http://localhost:3030/users", {
       method: 'POST',
       mode: 'cors',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(user)
-    }).then((response) => { alert(response); response.json() }).then((res) => alert(res));
+    }).then((res: any[]) => alert(res));
     setOpen(false);
   };
 

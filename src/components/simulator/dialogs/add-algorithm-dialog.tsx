@@ -1,17 +1,19 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, MenuItem, Select, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Algorithm } from "../../../intefaces/algorithm";
+import useAuthenticatedFetch from "../../../services/fetchService";
 
 export function AddAlgorithmDialog(props: {
 	addAlgorithmOpen: boolean; setAddAlgorithmOpen: (arg0: boolean) => void; addAlgorithm: (id: number) => void;
 }) {
 	const [algorithmId, setAlgorithmId] = useState(1);
 	const [availableAlgorithmList, setAvailableAlgorithmList] = useState([] as Algorithm[])
+	const { authedFetch } = useAuthenticatedFetch();
 	const handleAlgorithmChange = (event: any) => {
 		setAlgorithmId(event.target.value);
 	}
 	const init = () => {
-		fetch("http://localhost:8080/algorithms/available").then(res => res.json()).then(list => {
+		authedFetch("/algorithms/available").then(list => {
 		setAvailableAlgorithmList(list);
 	})}
 	useEffect(() => {

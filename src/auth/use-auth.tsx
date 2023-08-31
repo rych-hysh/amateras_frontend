@@ -125,9 +125,9 @@ const useProvideAuth = () : UseAuth => {
     let jwtToken;
     try{
         const session = await Auth.currentSession();
-        console.log("session: ", session);  // ここでセッション情報をログ出力します
+        // console.log("session: ", session);  // ここでセッション情報をログ出力します
         jwtToken = session.getIdToken().getJwtToken();
-        console.log("jwtToken: ", jwtToken);  // ここで JWT トークンをログ出力します
+        // console.log("jwtToken: ", jwtToken);  // ここで JWT トークンをログ出力します
     } catch (error) {
         console.log('error getting token: ', error);
     }
