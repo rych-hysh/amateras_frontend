@@ -54,7 +54,7 @@ export async function Request(path: string, token: string | undefined): Promise<
 
 		// Check if the request was successful
 		if (!response.ok) {
-			throw new Error(`HTTP error! status: ${response.status}`);
+			throw new Error(`HTTP error. request for ${path} was failed with status: ${response.status}`);
 		}
 
 		const data = await response.json();
