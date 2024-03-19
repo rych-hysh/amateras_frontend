@@ -168,7 +168,6 @@ export function Simulator() {
 	}, [isLoading]);
 
 	useEffect(() => {
-		console.log(fundsHistory)
 		if (simulator === undefined) {
 			setSimulator(simulatorList[0])
 			return
@@ -185,9 +184,11 @@ export function Simulator() {
 			setHistoryLoading(false);
 		})
 		setFundsHistoryLoading(true);
-		fetch("http://localhost:8080/funds/" + simulator!.id).then(res => res.json()).then(res => {
+		authedFetch("/funds/" + simulator!.id).then(res => {
 			setFunds(res);
 			setFundsHistoryLoading(false);
+		}).catch((e) => {
+			// TODO:
 		})
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [simulator])
@@ -204,7 +205,6 @@ export function Simulator() {
 		})
 		setFundsHistory(data);
 		setFundsHistoryLoading(false);
-		console.log(fundsHistory)
 	}, [funds])
 	return (
 		<PrivatePage>
