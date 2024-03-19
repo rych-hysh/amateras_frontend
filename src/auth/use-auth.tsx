@@ -12,9 +12,10 @@ interface UseAuth{
 	isLoading: boolean,
 	isAuthenticated: boolean,
 	signUp: (nickname: string, email: string, password: string) => Promise<Result>,
-	confirmSignUp: (verificationCode: string) => Promise<Result>,
+	confirmSignUp: (verificationCode: string) => Promise<Result>,	
 	signIn: (username: string, password: string) => Promise<Result>,
-	signOut: () => void
+	signOut: () => void,
+	getJwtToken: () => Promise<string | undefined>;
 }
 
 interface Props {
@@ -120,6 +121,20 @@ const useProvideAuth = () : UseAuth => {
 		}
 	};
 
+	const getJwtToken = async () => {
+    let jwtToken;
+    try{
+        const session = await Auth.currentSession();
+        // console.log("session: ", session);  // ここでセッション情報をログ出力します
+        jwtToken = session.getIdToken().getJwtToken();
+        // console.log("jwtToken: ", jwtToken);  // ここで JWT トークンをログ出力します
+    } catch (error) {
+        console.log('error getting token: ', error);
+    }
+    return jwtToken;
+}
+
+
 	return {
 		sub,
 		isLoading,
@@ -129,6 +144,7 @@ const useProvideAuth = () : UseAuth => {
 		confirmSignUp,
 		signIn,
 		signOut,
+		getJwtToken
 	};
 }
 // export const AuthProvider = (props) => {

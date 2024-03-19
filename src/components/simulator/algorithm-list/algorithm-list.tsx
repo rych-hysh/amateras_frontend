@@ -4,17 +4,19 @@ import { useEffect, useState } from "react";
 import { Algorithm } from "../../../intefaces/algorithm"
 import { AddAlgorithmDialog } from "../dialogs/add-algorithm-dialog";
 import { useAuth } from "../../../auth/use-auth";
+import useAuthenticatedFetch from "../../../services/fetchService";
 
 
 export function AlgorithmList(props: { simulatorId: number | undefined }) {
 	const [subscribeAlgorithmList, setSubscribeAlgorithmList] = useState([] as Algorithm[]);
 	const [addAlgorithmOpen, setAddAlgorithmOpen] = useState(false);
 	const { sub, isLoading } = useAuth();
+	const {authedFetch} = useAuthenticatedFetch();
 	const init = () => {
 		if (props.simulatorId! === undefined) {
 			return;
 		} else {
-			fetch("http://localhost:8080/algorithms/" + props.simulatorId).then(res => res.json()).then((r: Algorithm[]) => {
+			authedFetch("/algorithms/" + props.simulatorId).then((r: Algorithm[]) => {
 				setSubscribeAlgorithmList(r);
 			})
 		}
@@ -31,7 +33,7 @@ export function AlgorithmList(props: { simulatorId: number | undefined }) {
 			userUuid: sub
 		}
 		console.log(JSON.stringify(newAlgorithm));
-		fetch("http://localhost:8080/algorithms/add", { method: "POST", headers: header, body: JSON.stringify(newAlgorithm) })//.then(() => init(simulator.id));
+		authedFetch("/algorithms/add", { method: "POST", headers: header, body: JSON.stringify(newAlgorithm) })//.then(() => init(simulator.id));
 	}
 
 	useEffect(() => {
