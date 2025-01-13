@@ -1,10 +1,8 @@
 import { Box } from "@mui/material";
-import { useAuth } from "../../auth/use-auth";
 import useAuthenticatedFetch  from "../../services/fetchService"
 
 
 export function Algorythm(){
-	const {getJwtToken} = useAuth();
 	//getJwtToken().then(token => Request("/rates/all", token).then(res => console.log(res)));
   const { authedFetch } = useAuthenticatedFetch();
 	const fet = async () => {

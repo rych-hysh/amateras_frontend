@@ -10,6 +10,7 @@ import useAuthenticatedFetch from "../../../services/fetchService";
 export function AlgorithmList(props: { simulatorId: number | undefined }) {
 	const [subscribeAlgorithmList, setSubscribeAlgorithmList] = useState([] as Algorithm[]);
 	const [addAlgorithmOpen, setAddAlgorithmOpen] = useState(false);
+  // eslint-disable-next-line
 	const { sub, isLoading } = useAuth();
 	const {authedFetch} = useAuthenticatedFetch();
 	const init = () => {

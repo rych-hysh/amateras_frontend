@@ -1,5 +1,4 @@
 import { useAuth } from "../auth/use-auth";
-import { useContext } from "react";
 
 export default function useAuthenticatedFetch(){
 	const {getJwtToken} = useAuth();

@@ -1,4 +1,4 @@
-import { autocompleteClasses, Box, Paper, Stack } from "@mui/material";
+import { Paper, Stack } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { Chart } from "react-google-charts";
 import useAuthenticatedFetch from "../../services/fetchService";
@@ -47,6 +47,7 @@ const RSIopForEx = {
 export function Charts() {
 	// TODO: add interface
 	const [rates, setRates] = useState([] as any[]);
+  // eslint-disable-next-line
 	const [dataLoading, setDataLoading] = useState(true);
 	const [chartData, setChartData] = useState([] as any[]);
 	const {authedFetch} = useAuthenticatedFetch();
@@ -59,6 +60,7 @@ export function Charts() {
 
 	useEffect(() => {
 		setDataLoading(true);
+    // eslint-disable-next-line
 		data = [];
 		data.push(dataHeader);
 		rates.forEach((rate: any) => {
@@ -78,7 +80,9 @@ export function Charts() {
 	}, [rates])
 
 	useEffect(() => {
+    // eslint-disable-next-line
 		init()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	var rate = 100.4;

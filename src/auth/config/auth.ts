@@ -1,4 +1,4 @@
-import { Amplify, Auth } from "aws-amplify";
+import { Auth } from "aws-amplify";
 
 export const initAuth = () => {
 	Auth.configure({

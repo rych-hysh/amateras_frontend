@@ -1,6 +1,5 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, MenuItem, Select, TextField } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
 import { useState } from "react";
-import { Algorithm } from "../../../intefaces/algorithm";
 
 export function AddSimulatorDialog(props: {
 	addSimulatorOpen: boolean; setAddSimulatorOpen: (arg0: boolean) => void; addSimulator: (name: string) => void; 

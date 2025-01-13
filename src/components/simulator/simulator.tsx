@@ -19,9 +19,8 @@ import { EditNameDialog } from "./dialogs/edit-name-dialog";// @ts-ignore
 import { AddSimulatorDialog } from "./dialogs/add-simulator-dialog";
 import Histories from "../../intefaces/histories";
 
-import useAuthenticatedFetch, {Request} from "../../services/fetchService";
+import useAuthenticatedFetch from "../../services/fetchService";
 
-const fundHeader = ["date", "funds"];
 
 export function Simulator() {
 	const [simulatorList, setSimulatorList] = useState([] as Simulators[]);
@@ -37,6 +36,7 @@ export function Simulator() {
 	const [editNameOpen, setEditNameOpen] = useState(false);
 	const [addSimulatorOpen, setAddSimulatorOpen] = useState(false);
 	const [nameNullAlertOpen, setNameNullAlertOpen] = useState(false);
+  // eslint-disable-next-line
 	const [nameChangedAlertOpen, setNameChangedAlertOpen] = useState(false);
 	const { sub, isLoading } = useAuth();
 	const { authedFetch } = useAuthenticatedFetch();
@@ -62,7 +62,7 @@ export function Simulator() {
 			setSimulatorLoading(false);
 		});
 
-		if(simulator!.id == undefined)return;
+		if(simulator!.id === undefined)return;
 		setPositionsLoading(true);
 		authedFetch('/positions/' + simulator!.id + "/unsettled").then((res: Positions[]) => {
 			setPositions(res);

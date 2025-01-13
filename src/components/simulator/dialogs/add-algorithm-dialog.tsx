@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, MenuItem, Select, TextField } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, MenuItem, Select} from "@mui/material";
 import { useEffect, useState } from "react";
 import { Algorithm } from "../../../intefaces/algorithm";
 import useAuthenticatedFetch from "../../../services/fetchService";
@@ -17,7 +17,9 @@ export function AddAlgorithmDialog(props: {
 		setAvailableAlgorithmList(list);
 	})}
 	useEffect(() => {
+    // eslint-disable-next-line
 		init()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 	return (
 		<Dialog open={props.addAlgorithmOpen}>
