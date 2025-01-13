@@ -28,7 +28,7 @@ export function GridTest() {
 				</Grid>
 				<Grid item xs={8} sx={{ backgroundColor: "blue" }} className="b">
 					<div className="n">
-						item
+						item/test
 					</div>
 				</Grid>
 			</Grid>
