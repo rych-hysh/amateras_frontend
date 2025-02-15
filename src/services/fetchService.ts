@@ -11,7 +11,8 @@ export default function useAuthenticatedFetch(){
 	 * @returns 
 	 */
 	const authedFetch = async (path: string, options: any = {}) => {
-		const baseURI = "http://localhost:8080";
+		const baseURI = process.env.API_HOST !== undefined ? process.env.API_HOST : "http://localhost:8080";
+    console.log(baseURI);
 		const url = baseURI + path;
 		const token = await getJwtToken();
 		const headers = new Headers(options.headers || {});
