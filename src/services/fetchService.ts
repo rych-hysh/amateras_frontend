@@ -12,7 +12,7 @@ export default function useAuthenticatedFetch(){
 	 */
 	const authedFetch = async (path: string, options: any = {}) => {
 		const baseURI = process.env.API_HOST !== undefined ? process.env.API_HOST : "http://localhost:8080";
-    console.log(process.env.API_HOST);
+    console.log(process.env["API_HOST"]);
 		const url = baseURI + path;
 		const token = await getJwtToken();
 		const headers = new Headers(options.headers || {});
