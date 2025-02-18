@@ -12,7 +12,6 @@ export default function useAuthenticatedFetch(){
 	 */
 	const authedFetch = async (path: string, options: any = {}) => {
 		const baseURI = process.env.REACT_APP_API_HOST !== undefined ? process.env.REACT_APP_API_HOST : "http://localhost:8080";
-    console.log(process.env["REACT_APP_API_HOST"]);
 		const url = baseURI + path;
 		const token = await getJwtToken();
 		const headers = new Headers(options.headers || {});
