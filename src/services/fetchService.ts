@@ -1,5 +1,6 @@
 import { useAuth } from "../auth/use-auth";
 import { useContext } from "react";
+const baseURI = process.env.REACT_APP_API_HOST || "http://localhost:8080";
 
 export default function useAuthenticatedFetch(){
 	const {getJwtToken} = useAuth();
@@ -11,7 +12,6 @@ export default function useAuthenticatedFetch(){
 	 * @returns 
 	 */
 	const authedFetch = async (path: string, options: any = {}) => {
-		const baseURI = process.env.REACT_APP_API_HOST !== undefined ? process.env.REACT_APP_API_HOST : "http://localhost:8080";
 		const url = baseURI + path;
 		const token = await getJwtToken();
 		const headers = new Headers(options.headers || {});
@@ -35,14 +35,9 @@ export default function useAuthenticatedFetch(){
  * @returns 
  */
 export async function Request(path: string, token: string | undefined): Promise<any>{
-	const baseURI = "(http://localhost:8080)";
 	const url = baseURI + path;
-	console.log(path);
-	console.log(token);
 	const {getJwtToken} = useAuth(); 
 	const tokensJ = await getJwtToken();
-	console.log(tokensJ)
-	console.log("nya")
 	try {
 		const response = await fetch(url, {
 			method: 'GET',
@@ -59,7 +54,6 @@ export async function Request(path: string, token: string | undefined): Promise<
 
 		const data = await response.json();
 
-		console.log(data);
 		return data;
 	} catch (error) {
 		console.error('Error:', error);
