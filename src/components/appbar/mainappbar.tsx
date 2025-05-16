@@ -121,7 +121,7 @@ export function MainAppBar() {
   };
 
   const handleDrawerOpen = () => {
-    authedFetch("http://localhost:3030/users").then((res : any[]) => alert(res[0].username));
+    authedFetch("/users").then((res : any[]) => alert(res[0].username));
     setOpen(true);
   };
 
@@ -132,7 +132,7 @@ export function MainAppBar() {
 
   const handleDrawerClose = () => {
 
-    authedFetch("http://localhost:3030/users", {
+    authedFetch("/users", {
       method: 'POST',
       mode: 'cors',
       headers: {

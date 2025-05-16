@@ -47,13 +47,7 @@ export function Simulator() {
 	var data: any[] = [];
 	const init = (simulatorId: number | null = null, getLast: boolean = false) => {
 		if (isLoading) return;
-		/*
-			memo:
-				localのSpringBootに接続する場合は
-					url = "http://localhost:8080/" ...
-				amazon ec2のSpringBootに接続する場合はフロントエンドのプロキシを利用して
-					url = "http://44.202.140.11/amateras/"
-		*/
+		
 		setSimulatorLoading(true);
 		authedFetch("/simulators/" + sub).then((res: Simulators[]) => {
 			if (res.length === 0) {
@@ -77,7 +71,7 @@ export function Simulator() {
 			setHistoryLoading(false);
 		})
 		setFundsHistoryLoading(true);
-		fetch("http://localhost:8080/funds/" + simulator!.id).then(res => res.json()).then(res => {
+		authedFetch("/funds/" + simulator!.id).then(res => {
 			setFunds(res);
 			setFundsHistoryLoading(false);
 		})
