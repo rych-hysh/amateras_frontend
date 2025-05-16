@@ -13,7 +13,7 @@ export function AlgorithmList(props: { simulatorId: number | undefined }) {
 	const { sub, isLoading } = useAuth();
 	const {authedFetch} = useAuthenticatedFetch();
 	const init = () => {
-		if (props.simulatorId === undefined) {
+		if (props.simulatorId! === undefined) {
 			return;
 		} else {
 			authedFetch("/algorithms/" + props.simulatorId).then((r: Algorithm[]) => {

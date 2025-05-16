@@ -1,5 +1,5 @@
 export const data = [
-	["algorythm", "origin", "alg1", "alg2"],
+	["date", "origin", "alg1", "alg2"],
 	["Copper", 100, -8.94, 8], // RGB value
 	["Silver", 100, -10.49, 8], // English color name
 	["Gold", 100, -19.3, 10],

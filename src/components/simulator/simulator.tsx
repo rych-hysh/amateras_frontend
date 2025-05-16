@@ -1,5 +1,5 @@
 import { Alert, Button, CircularProgress, IconButton, MenuItem, Select, SelectChangeEvent, Snackbar } from "@mui/material";
-import { PlayCircle, StopCircle } from "@mui/icons-material";
+import { Google, PlayCircle, StopCircle } from "@mui/icons-material";
 import { Chart } from "react-google-charts";
 import { useEffect, useState } from "react";
 import PrivatePage from "../private-page";
@@ -7,7 +7,6 @@ import { useAuth } from "../../auth/use-auth";
 
 
 import "./simulator.scss"
-import { data } from "./mockdata";// @ts-ignore
 import { PositionsList } from "./positions/positions-list";// @ts-ignore
 import { History } from "./history/history";// @ts-ignore
 import { AlgorithmList } from "./algorithm-list/algorithm-list";// @ts-ignore
@@ -32,6 +31,10 @@ export function Simulator() {
 	const [positionLoading, setPositionsLoading] = useState(true);
 	const [historyLoading, setHistoryLoading] = useState(true);
 
+	const [funds, setFunds] = useState([] as any[]);
+	const [fundsHistory, setFundsHistory] = useState([] as any[]);
+	const [fundsHistoryLoading, setFundsHistoryLoading] = useState(true);
+
 	const [confirmPlayOpen, setConfirmPlayOpen] = useState(false);
 	const [confirmStopOpen, setConfirmStopOpen] = useState(false);
 	const [editNameOpen, setEditNameOpen] = useState(false);
@@ -41,6 +44,7 @@ export function Simulator() {
 	const { sub, isLoading } = useAuth();
 	const { authedFetch } = useAuthenticatedFetch();
 
+	var data: any[] = [];
 	const init = (simulatorId: number | null = null, getLast: boolean = false) => {
 		if (isLoading) return;
 		/*
@@ -61,7 +65,6 @@ export function Simulator() {
 			setSimulator(simulatorList.find(simulator => simulator.id === simulatorId));
 			setSimulatorLoading(false);
 		});
-
 		if(simulator!.id == undefined)return;
 		setPositionsLoading(true);
 		authedFetch('/positions/' + simulator!.id + "/unsettled").then((res: Positions[]) => {
@@ -72,6 +75,11 @@ export function Simulator() {
 		authedFetch('/positions/' + simulator!.id + "/settled").then((res: Histories[]) => {
 			setHistories(res);
 			setHistoryLoading(false);
+		})
+		setFundsHistoryLoading(true);
+		fetch("http://localhost:8080/funds/" + simulator!.id).then(res => res.json()).then(res => {
+			setFunds(res);
+			setFundsHistoryLoading(false);
 		})
 	}
 
@@ -164,6 +172,7 @@ export function Simulator() {
 			setSimulator(simulatorList[0])
 			return
 		};
+		if(simulator!.id == undefined)return;
 		setPositionsLoading(true);
 		authedFetch('/positions/' + simulator!.id + "/unsettled").then((res: Positions[]) => {
 			setPositions(res);
@@ -174,10 +183,29 @@ export function Simulator() {
 			setHistories(res);
 			setHistoryLoading(false);
 		})
+		setFundsHistoryLoading(true);
+		authedFetch("/funds/" + simulator!.id).then(res => {
+			setFunds(res);
+			setFundsHistoryLoading(false);
+		}).catch((e) => {
+			// TODO:
+		})
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [simulator])
 
-
+	useEffect(() => {
+		setFundsHistoryLoading(true);
+		data = [];
+		data.push(fundHeader);
+		funds.forEach((fund: any) => {
+			var datum: any[] = [];
+			datum.push(fund["date"])
+			datum.push(fund["funds"])
+			data.push(datum);
+		})
+		setFundsHistory(data);
+		setFundsHistoryLoading(false);
+	}, [funds])
 	return (
 		<PrivatePage>
 			<div id="simulator-outer">
@@ -218,11 +246,11 @@ export function Simulator() {
 				</div>
 				<div id="PL" className="simulator-inner">
 					<Chart
-						chartType="SteppedAreaChart"
+						chartType="LineChart"
 						width="100%"
 						height="100%"
-						data={data}
-						options={{ isStacked: true }}
+						data={fundsHistory}
+						options={{ isStacked: true, vAxis:{format: '###,###'}}}
 					/>
 				</div>
 				<AlgorithmList simulatorId={simulator?.id}/>
