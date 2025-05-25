@@ -1,5 +1,5 @@
-import { autocompleteClasses, Box, Paper, Stack } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { Paper, Stack, CircularProgress } from "@mui/material";
+import { useEffect, useState } from "react";
 import { Chart } from "react-google-charts";
 import useAuthenticatedFetch from "../../services/fetchService";
 
@@ -46,22 +46,16 @@ const RSIopForEx = {
 
 export function Charts() {
 	// TODO: add interface
-	const [rates, setRates] = useState([] as any[]);
 	const [dataLoading, setDataLoading] = useState(true);
 	const [chartData, setChartData] = useState([] as any[]);
 	const {authedFetch} = useAuthenticatedFetch();
 	var data: any[] = [];
 	const init = () => {
-		authedFetch("/rates/candle?numOfBar=8&dataInBar=4&nForSigma=2").then(res => {
-			setRates(res);
-		})
-	}
-
-	useEffect(() => {
-		setDataLoading(true);
-		data = [];
+	  setDataLoading(true);
+		authedFetch("/rates/candle?numOfBar=256&dataInBar=4&nForSigma=2").then(res => {
+    data = [];
 		data.push(dataHeader);
-		rates.forEach((rate: any) => {
+		res.forEach((rate: any) => {
 			var datum: any[] = [];
 			datum.push(rate["date"]);
 			datum.push(rate["low"]);
@@ -74,8 +68,9 @@ export function Charts() {
 			data.push(datum);
 		})
 		setChartData(data);
-		setDataLoading(false)
-	}, [rates])
+    setDataLoading(false);
+		})
+	}
 
 	useEffect(() => {
 		init()
@@ -99,14 +94,17 @@ export function Charts() {
 
 			</div>
 			<div id="chartMain">
-				<Chart
-					chartType="ComboChart"
-					data={chartData}
-					options={options}
-					legendToggle
-					width={"100%"}
-					height={"100%"}
-				></Chart>
+        {dataLoading ? (<div className="simulatorsProgress" style={{alignItems: "center"}}> <CircularProgress /> </div>) :
+          <Chart
+            chartType="ComboChart"
+            data={chartData}
+            options={options}
+            legendToggle
+            width={"100%"}
+            height={"100%"}
+          ></Chart>
+        }
+				
 			</div>
 			<div id="chartSub">
 				<Chart
