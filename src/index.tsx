@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import { MainAppBar } from './components/appbar/mainappbar';
+import { AppLayout } from './components/app-layout/app-layout';
 import reportWebVitals from './reportWebVitals';
 import { initAuth } from './auth/config/auth';
 import { BrowserRouter } from 'react-router-dom';
@@ -16,7 +16,7 @@ root.render(
   <React.StrictMode>
     <BrowserRouter>
       <ProvideAuth>
-        <MainAppBar />
+        <AppLayout />
       </ProvideAuth>
     </BrowserRouter>
   </React.StrictMode>
